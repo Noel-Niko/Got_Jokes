@@ -8,6 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import com.livingtechusa.gotjokes.ui.build.BuildScreen
+import com.livingtechusa.gotjokes.ui.theme.JokesTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -20,18 +21,20 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.background
-            ) {
-                BuildScreen()
+            JokesTheme() {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ) {
+                    BuildScreen()
+                }
+                //        setContentView(R.layout.activity_main)
+                //        if (savedInstanceState == null) {
+                //            supportFragmentManager.beginTransaction()
+                //                .replace(R.id.container, BuildFragment.newInstance())
+                //                .commitNow()
+                //        }
             }
-//        setContentView(R.layout.activity_main)
-//        if (savedInstanceState == null) {
-//            supportFragmentManager.beginTransaction()
-//                .replace(R.id.container, BuildFragment.newInstance())
-//                .commitNow()
-//        }
         }
     }
 }
