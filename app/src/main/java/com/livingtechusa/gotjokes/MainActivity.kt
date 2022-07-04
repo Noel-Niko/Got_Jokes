@@ -2,22 +2,36 @@ package com.livingtechusa.gotjokes
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.livingtechusa.gotjokes.ui.build.BuildFragment
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.ui.Modifier
+import com.livingtechusa.gotjokes.ui.build.BuildScreen
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    @Inject lateinit var app: BaseApplication
+    @Inject
+    lateinit var app: BaseApplication
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.container, BuildFragment.newInstance())
-                .commitNow()
+        setContent {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colors.background
+            ) {
+                BuildScreen()
+            }
+//        setContentView(R.layout.activity_main)
+//        if (savedInstanceState == null) {
+//            supportFragmentManager.beginTransaction()
+//                .replace(R.id.container, BuildFragment.newInstance())
+//                .commitNow()
+//        }
         }
     }
 }

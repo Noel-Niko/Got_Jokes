@@ -20,7 +20,8 @@ import com.livingtechusa.gotjokes.domain.util.LoadPicture
 
 @Composable
 fun BuildView(
-    joke: Joke
+    joke: Joke,
+    onUserInput:() -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -28,7 +29,7 @@ fun BuildView(
             .fillMaxWidth()
     ) {
         //Check each field and display if not null
-        joke.image?.let { url ->
+        joke.image.let { url ->
             val image = LoadPicture(url = url, defaultImage = DEFAULT_IMAGE).value  //a bitMap
             image?.let { img ->
                 Image(
@@ -45,11 +46,12 @@ fun BuildView(
             Row(
                 modifier = Modifier.fillMaxWidth().padding(8.dp)
             ) {
+                //onUserInput = {}
                 Text(
-                    text = "Charlie Chaplin",
+                    text = "User Free text: Charlie Chaplin",
                     modifier = Modifier.fillMaxWidth()
                         .wrapContentWidth(align = Alignment.Start),
-                    style = MaterialTheme.typography.h3
+                    style = MaterialTheme.typography.h3,
                 )
             }
         }

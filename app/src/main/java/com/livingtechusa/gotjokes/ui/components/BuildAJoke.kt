@@ -18,15 +18,21 @@ import com.livingtechusa.gotjokes.domain.util.LoadPicture
 @Composable
 fun BuildAJoke(
     loading: Boolean,
-    joke: Joke,
-    scaffoldState: ScaffoldState,
+    joke: Joke
     ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.background)
     ) {
-        val img = LoadPicture(defaultImage = DEFAULT_IMAGE).value
+        BuildView(
+            joke = joke,
+            onUserInput = {}
+        )
+    }
+}
+/*
+val img = LoadPicture(defaultImage = DEFAULT_IMAGE).value
         if (loading && joke.image.isNullOrEmpty()) {
             if (img?.asImageBitmap() != null) {
                 //ShimmerAnimation()
@@ -50,5 +56,4 @@ fun BuildAJoke(
                 BuildView(joke = it)
             }
         }
-    }
-}
+ */

@@ -62,8 +62,8 @@ class BuildFragment : Fragment() {
             setContent {
 
 
-                val joke: Joke? by viewModel.joke.observeAsState()             //: State<Joke?> = viewModel.joke.observeAsState()
-                val loading = viewModel.loading.observeAsState()
+                val joke = viewModel.joke       //: Joke? by viewModel.joke.observeAsState()             //: State<Joke?> = viewModel.joke.observeAsState()
+                val loading = viewModel.loading  ///.observeAsState()
                 val scaffoldState = rememberScaffoldState()
 
 
@@ -97,11 +97,10 @@ class BuildFragment : Fragment() {
                         )
                     }
                 ) {
-                    viewModel.joke.value?.let { joke ->
+                    joke?.let { it1 ->
                         BuildAJoke(
-                            loading = viewModel.loading.value ?: false,
-                            joke = joke,
-                            scaffoldState = scaffoldState
+                            loading = loading ?: false,
+                            joke = it1
                         )
                     }
                 }
