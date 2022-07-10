@@ -93,6 +93,9 @@ class BuildViewModel() : ViewModel() {
                         getImgFlipImage()
                         getYoMammaJokes()
                     }
+                    is MoveTextToCaption -> {
+
+                    }
                 }
             } catch (e: Exception) {
                 Log.e(

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
@@ -128,9 +130,13 @@ fun BuildLayout(modifier: Modifier, image: ImgFlip.Data.Meme?, yoMamma: YoMamma?
                         label = { Text("Caption") }
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(
+                    ClickableText(
                         modifier = Modifier.fillMaxWidth(),
-                        text = yoMamma?.joke ?: "Nuttin to see here."
+                        text =  AnnotatedString(yoMamma?.joke ?: "Nuttin to see here."),
+                        onClick = {
+                            caption = yoMamma?.joke.toString()
+                        }
+
                     )
                     //                        Text(
                     //                            modifier = Modifier.fillMaxWidth(),

@@ -4,4 +4,5 @@ sealed class BuildEvent {
 
     object GetImgFlipImages : BuildEvent()
     object GetNewImgFlipImage : BuildEvent()
+    object MoveTextToCaption : BuildEvent()
 }
