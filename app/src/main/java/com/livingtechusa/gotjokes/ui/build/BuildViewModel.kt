@@ -8,6 +8,7 @@ import com.livingtechusa.gotjokes.data.api.model.ImgFlip
 import com.livingtechusa.gotjokes.data.api.model.YoMamma
 import com.livingtechusa.gotjokes.network.ImgFlipApi
 import com.livingtechusa.gotjokes.network.YoMammaApi
+import com.livingtechusa.gotjokes.network.YodaService
 import com.livingtechusa.gotjokes.ui.build.BuildEvent.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,9 +20,9 @@ enum class ApiStatus { PRE_INIT, LOADING, ERROR, DONE }
 
 class BuildViewModel() : ViewModel() {
 
-//    private val _status = MutableStateFlow(ApiStatus.PRE_INIT)
-//    val status: StateFlow<ApiStatus>
-//        get() = _status
+    //    private val _status = MutableStateFlow(ApiStatus.PRE_INIT)
+    //    val status: StateFlow<ApiStatus>
+    //        get() = _status
 
     private val _imgFlipMemeList = MutableStateFlow(emptyList<ImgFlip.Data.Meme>())
     val imgFlipMemeList: StateFlow<List<ImgFlip.Data.Meme>> get() = _imgFlipMemeList
@@ -29,9 +30,14 @@ class BuildViewModel() : ViewModel() {
     private val _imgFlipMeme = MutableStateFlow(ImgFlip.Data.Meme.buildFromJson(null))
     val imgFlipMeme: StateFlow<ImgFlip.Data.Meme?> get() = _imgFlipMeme
 
-    private val _yoMamma = MutableStateFlow(YoMamma(null))
-    val yoMamma: StateFlow<YoMamma> get() = _yoMamma //as StateFlow<String>
+    private val _caption = MutableStateFlow(String())
+    val caption: StateFlow<String> get() = _caption
 
+    private val _yodaSpeak = MutableStateFlow(String())
+    val yodaSpeak: StateFlow<String> get() = _yodaSpeak
+
+    private val _yoMamma = MutableStateFlow(YoMamma(null))
+    val yoMamma: StateFlow<YoMamma> get() = _yoMamma
 
     private val _joke = MutableStateFlow(Joke())
     var joke: StateFlow<Joke> = _joke
@@ -44,17 +50,46 @@ class BuildViewModel() : ViewModel() {
         _loading = true
         getImgFlipPhotos()
         getYoMammaJokes()
-//        if (state.get<String>(STATE_KEY_URL) == "com.livingtechusa.gotjokes.ui.build.joke.url") {
-//            state.get<String>(STATE_KEY_URL)?.let { imgFlipUrl ->
-//                joke.image = imgFlipUrl
-//            } ?: onTriggerEvent(GetImgFlipImages)
-//        } else {
-//            onTriggerEvent(GetImgFlipImages)
-//        }
+        //        if (state.get<String>(STATE_KEY_URL) == "com.livingtechusa.gotjokes.ui.build.joke.url") {
+        //            state.get<String>(STATE_KEY_URL)?.let { imgFlipUrl ->
+        //                joke.image = imgFlipUrl
+        //            } ?: onTriggerEvent(GetImgFlipImages)
+        //        } else {
+        //            onTriggerEvent(GetImgFlipImages)
+        //        }
 
     }
 
 
+    fun onTriggerEvent(event: BuildEvent) {
+        viewModelScope.launch {
+            try {
+                when (event) {
+                    is GetImgFlipImages -> {
+                        _caption.value = ""
+                        getImgFlipImageList()
+                        getYoMammaJokes()
+                    }
+                    is GetNewImgFlipImage -> {
+                        _caption.value = ""
+                        getImgFlipImage()
+                        getYoMammaJokes()
+                    }
+                    is ConvertToYodaSpeak -> {
+                        ConvertToTextToYodaSpeak(event.text)
+                    }
+                    is UpdateCaption -> {
+                        _caption.value = event.text
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(
+                    "BuildViewModel - ImgFlip: ",
+                    "Exception: ${e.message}  with cause: ${e.cause}"
+                )
+            }
+        }
+    }
 
     /**
      * Gets  photos from the ImgFlip API Retrofit service and updates the
@@ -81,27 +116,14 @@ class BuildViewModel() : ViewModel() {
         }
     }
 
-    fun onTriggerEvent(event: BuildEvent) {
+    private fun ConvertToTextToYodaSpeak(text: String) {
         viewModelScope.launch {
             try {
-                when (event) {
-                    is GetImgFlipImages -> {
-                        getImgFlipImageList()
-                        getYoMammaJokes()
-                    }
-                    is GetNewImgFlipImage -> {
-                        getImgFlipImage()
-                        getYoMammaJokes()
-                    }
-                    is MoveTextToCaption -> {
-
-                    }
-                }
+                val result = YodaService.YodaSpeakApi.retrofitService.getYodaSpeak(text)
+                _caption.value = result?.contents?.translated ?: "Too many tries."
             } catch (e: Exception) {
-                Log.e(
-                    "BuildViewModel - ImgFlip: ",
-                    "Exception: ${e.message}  with cause: ${e.cause}"
-                )
+                Log.i("Yoda", e.message + " with cause " + e.cause)
+                _caption.value = "Sorry, Yoda only speaks 5 times an hour."
             }
         }
     }
@@ -126,8 +148,8 @@ class BuildViewModel() : ViewModel() {
     }
 
     //notify on user input
-//    fun UiUpdatedByUser(joke: Joke, bool: Boolean) {
-//        _joke.chuckNorris = "Bad Ass"
-//    }
+    //    fun UiUpdatedByUser(joke: Joke, bool: Boolean) {
+    //        _joke.chuckNorris = "Bad Ass"
+    //    }
 
 }
