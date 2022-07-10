@@ -1,5 +1,6 @@
 package com.livingtechusa.gotjokes.ui.build
 
+import android.widget.ImageView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -33,9 +35,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.livingtechusa.gotjokes.data.api.model.ImgFlip
 import com.livingtechusa.gotjokes.data.api.model.YoMamma
 import com.livingtechusa.gotjokes.ui.theme.JokesTheme
@@ -46,6 +50,7 @@ fun BuildScreen() {
     val buildViewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
     val image by buildViewModel.imgFlipMeme.collectAsState()
     val yoMamma by buildViewModel.yoMamma.collectAsState()
+    val caption by buildViewModel.caption.collectAsState()
     val scaffoldState = rememberScaffoldState()
 
     JokesTheme() {
@@ -79,83 +84,81 @@ fun BuildScreen() {
                 )
             }
         ) { padding ->
-            BuildLayout(Modifier.padding(padding), image, yoMamma)
-        }
+            // BuildLayout(buildViewModel,Modifier.padding(padding), image, yoMamma)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
 
-    }
-}
-
-@Composable
-fun BuildLayout(modifier: Modifier, image: ImgFlip.Data.Meme?, yoMamma: YoMamma?) {
-    var caption by rememberSaveable() { mutableStateOf("My Caption") }
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-
-    ) {
-        //TODO: reduce to one randomly selected picture
-        // add placeholders for the text
-        //animate the progress icon to be 3 dots moving
-        if (image?.url == null && yoMamma?.joke == null) {
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = ((LocalConfiguration.current.screenHeightDp) / 3).dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-        } else {
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp)
-                ) {
-                    Spacer(Modifier.height(16.dp))
-                    if (image != null) {
-                        MemeImgCard(meme = image)
+            ) {
+                //TODO: reduce to one randomly selected picture
+                // add placeholders for the text
+                //animate the progress icon to be 3 dots moving
+                if (image?.url == null && yoMamma?.joke == null) {
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = ((LocalConfiguration.current.screenHeightDp) / 3).dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    TextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        value = caption,
-                        onValueChange = {
-                            caption = it
-                        },
-                        label = { Text("Caption") }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = yoMamma?.joke ?: "Nuttin to see here."
-                    )
-                    //                        Text(
-                    //                            modifier = Modifier.fillMaxWidth(),
-                    //                            text = "Meme Title: ${image.name}"
-                    //                        )
+                } else {
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(8.dp)
+                        ) {
+                            Spacer(Modifier.height(16.dp))
+                            if (image != null) {
+                                MemeImgCard(meme = image!!)
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                            TextField(
+                                modifier = Modifier.fillMaxWidth(),
+                                value = caption,
+                                onValueChange = {
+                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(it))
+                                },
+                                label = { Text("Caption") }
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            ClickableText(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = AnnotatedString("Convert Caption to Yoda Speak"),
+                                onClick = {
+                                    buildViewModel.onTriggerEvent(BuildEvent.ConvertToYodaSpeak(caption))
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            ClickableText(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = AnnotatedString(yoMamma.joke ?: "Nuttin to see here."),
+                                onClick = {
+                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(yoMamma.joke.toString()))
+                                }
 
+                            )
+                        }
+                    }
                 }
             }
         }
+
     }
 }
 
-
-//    Column(modifier = modifier) {
-//        StatefulContentUpdater()
-//
-//        BuildAJoke(
-//            loading = buildViewModel.loading,
-//            joke = buildViewModel.joke
-//        )
-//    }
 
 @Composable
 fun MemeImgCard(meme: ImgFlip.Data.Meme) {
-    val imagePainter = rememberAsyncImagePainter(model = meme.url)
+    val imagePainter = rememberImagePainter(     //data = meme.url, )
+        data = meme.url,
+        builder = {
+            allowHardware(false)
+        }
+    )
     Card(shape = MaterialTheme.shapes.medium, modifier = Modifier.padding(16.dp)) {
         Box {
             Image(
@@ -166,20 +169,6 @@ fun MemeImgCard(meme: ImgFlip.Data.Meme) {
                     .height(200.dp),
                 contentScale = ContentScale.Fit
             )
-
-            //            Surface(
-            //                color = MaterialTheme.colors.onSurface.copy(alpha = 0.3f),
-            //                modifier = Modifier.align((Alignment.BottomCenter)),
-            //                contentColor = MaterialTheme.colors.surface
-            //            ) {
-            //                Column(
-            //                    modifier = Modifier
-            //                        .fillMaxWidth()
-            //                        .padding(4.dp)
-            //                ) {
-            //                    Text(text = "Meme Title: ${meme.name}")
-            //                }
-            //            }
         }
     }
 
