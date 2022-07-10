@@ -1,5 +1,4 @@
-package com.livingtechusa.gotjokes.domain.model
-
+package com.livingtechusa.gotjokes.data.api.model
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,7 +11,7 @@ class Joke(
     randomFact: String = "",
     yoMamma: String = "",
     chuckNorris: String = "",
-    ) {
+) {
     var image: String by mutableStateOf(image)
     var freeText: String by mutableStateOf(freeText)
     var yodaText: String by mutableStateOf(yodaText)
