@@ -4,10 +4,11 @@ import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
 import com.livingtechusa.gotjokes.data.api.model.Joke
-import com.livingtechusa.gotjokes.data.api.model.imgFlip
+import com.livingtechusa.gotjokes.data.api.model.ImgFlip
+import com.livingtechusa.gotjokes.data.api.model.YoMamma
 import com.livingtechusa.gotjokes.network.ImgFlipApi
+import com.livingtechusa.gotjokes.network.YoMammaApi
 import com.livingtechusa.gotjokes.ui.build.BuildEvent.*
-import kotlin.random.Random
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -22,11 +23,15 @@ class BuildViewModel() : ViewModel() {
 //    val status: StateFlow<ApiStatus>
 //        get() = _status
 
-    private val _imgFlipMemeList = MutableStateFlow(emptyList<imgFlip.Data.Meme>())
-    val imgFlipMemeList: StateFlow<List<imgFlip.Data.Meme>> get() = _imgFlipMemeList
+    private val _imgFlipMemeList = MutableStateFlow(emptyList<ImgFlip.Data.Meme>())
+    val imgFlipMemeList: StateFlow<List<ImgFlip.Data.Meme>> get() = _imgFlipMemeList
 
-    private val _imgFlipMeme = MutableStateFlow(imgFlip.Data.Meme())
-    val imgFlipMeme: StateFlow<imgFlip.Data.Meme?> get() = _imgFlipMeme
+    private val _imgFlipMeme = MutableStateFlow(ImgFlip.Data.Meme.buildFromJson(null))
+    val imgFlipMeme: StateFlow<ImgFlip.Data.Meme?> get() = _imgFlipMeme
+
+    private val _yoMamma = MutableStateFlow(YoMamma(null))
+    val yoMamma: StateFlow<YoMamma> get() = _yoMamma //as StateFlow<String>
+
 
     private val _joke = MutableStateFlow(Joke())
     var joke: StateFlow<Joke> = _joke
@@ -38,6 +43,7 @@ class BuildViewModel() : ViewModel() {
     init {
         _loading = true
         getImgFlipPhotos()
+        getYoMammaJokes()
 //        if (state.get<String>(STATE_KEY_URL) == "com.livingtechusa.gotjokes.ui.build.joke.url") {
 //            state.get<String>(STATE_KEY_URL)?.let { imgFlipUrl ->
 //                joke.image = imgFlipUrl
@@ -63,6 +69,17 @@ class BuildViewModel() : ViewModel() {
         }
     }
 
+    /**
+     * Gets jokes from the YoMamma API Retrofit service and updates the
+     * [YoMammaJokes] [List] [LiveData].
+     */
+    private fun getYoMammaJokes() {
+        viewModelScope.launch {
+            val result = YoMammaApi.retrofitService.getYoMammaJoke()
+            _yoMamma.value = result
+            _loading = false
+        }
+    }
 
     fun onTriggerEvent(event: BuildEvent) {
         viewModelScope.launch {
@@ -70,9 +87,11 @@ class BuildViewModel() : ViewModel() {
                 when (event) {
                     is GetImgFlipImages -> {
                         getImgFlipImageList()
+                        getYoMammaJokes()
                     }
                     is GetNewImgFlipImage -> {
                         getImgFlipImage()
+                        getYoMammaJokes()
                     }
                 }
             } catch (e: Exception) {
