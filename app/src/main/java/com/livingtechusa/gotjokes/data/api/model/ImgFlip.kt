@@ -8,7 +8,7 @@ import org.json.JSONObject
 
 
 @JsonClass(generateAdapter = true)
-data class imgFlip(
+data class ImgFlip(
     @Json(name = "data")
     val `data`: Data,
     @Json(name = "success")
@@ -22,17 +22,17 @@ data class imgFlip(
         @JsonClass(generateAdapter = true)
         data class Meme(
             @Json(name = "box_count")
-            val boxCount: Int = 0, // 2
+            val boxCount: Int, // 2
             @Json(name = "height")
-            val height: Int = 0, // 1200
+            val height: Int, // 1200
             @Json(name = "id")
-            val id: String = "", // 181913649
+            val id: String, // 181913649
             @Json(name = "name")
-            val name: String = "", // Drake Hotline Bling
+            val name: String, // Drake Hotline Bling
             @Json(name = "url")
-            val url: String = "", // https://i.imgflip.com/30b1gx.jpg
+            val url: String, // https://i.imgflip.com/30b1gx.jpg
             @Json(name = "width")
-            val width: Int = 0 // 1200
+            val width: Int // 1200
         ) {
             companion object {
                 @JvmStatic
@@ -55,6 +55,7 @@ data class imgFlip(
         companion object {
             @JvmStatic
             fun buildFromJson(jsonObject: JSONObject?): Data? {
+
                 jsonObject?.run {
                     return Data(
                         ArrayList<Meme>().apply {
@@ -72,11 +73,11 @@ data class imgFlip(
     }
     companion object {
         @JvmStatic
-        fun buildFromJson(jsonObject: JSONObject?): imgFlip? {
+        fun buildFromJson(jsonObject: JSONObject?): ImgFlip? {
 
             jsonObject?.run {
                 return Data.buildFromJson(optJSONObject("data"))?.let {
-                    imgFlip(
+                    ImgFlip(
                         it,
                         optBoolean("success")
                     )

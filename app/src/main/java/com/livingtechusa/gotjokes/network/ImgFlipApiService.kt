@@ -2,13 +2,13 @@ package com.livingtechusa.gotjokes.network
 
 import com.livingtechusa.gotjokes.data.api.ApiConstants
 import com.livingtechusa.gotjokes.data.api.ApiConstants.BASE_URL_IMGFLIP
-import com.livingtechusa.gotjokes.data.api.model.imgFlip
+import com.livingtechusa.gotjokes.data.api.model.ImgFlip
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 
 /**
- * Use the Retrofit builder to build a retrofit object using a Moshi converter with our Moshi
+ * Use the Retrofit builder to build a retrofit object using a Moshi converter with Moshi
  * object.
  */
 private val imgFlipRetrofit = Retrofit.Builder()
@@ -21,7 +21,7 @@ private val imgFlipRetrofit = Retrofit.Builder()
  */
 interface ImgFlipApiService {
     @GET(ApiConstants.END_POINT_IMGFLIP)
-    suspend fun getImgFlipMeme():  imgFlip
+    suspend fun getImgFlipMeme():  ImgFlip
 }
 
 /**
