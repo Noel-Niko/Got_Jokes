@@ -14,7 +14,7 @@ private val yodaRetrofit = Retrofit.Builder()
     .baseUrl(BASE_URL_YODA)
     .build()
 
-interface YodaService {
+interface YodaApiService {
     @GET(END_POINT_YODA)
     suspend fun getYodaSpeak(
         @Query("text") text: String
@@ -22,8 +22,8 @@ interface YodaService {
 
 
 object YodaSpeakApi {
-    val retrofitService: YodaService by lazy {
-        yodaRetrofit.create(YodaService::class.java)
+    val retrofitService: YodaApiService by lazy {
+        yodaRetrofit.create(YodaApiService::class.java)
     }
 }
 

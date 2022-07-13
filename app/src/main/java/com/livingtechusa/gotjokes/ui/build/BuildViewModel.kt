@@ -3,12 +3,18 @@ package com.livingtechusa.gotjokes.ui.build
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
+import com.livingtechusa.gotjokes.data.api.model.ChuckNorris
 import com.livingtechusa.gotjokes.data.api.model.Joke
 import com.livingtechusa.gotjokes.data.api.model.ImgFlip
+import com.livingtechusa.gotjokes.data.api.model.MemeMakerImage
+import com.livingtechusa.gotjokes.data.api.model.RandomFact
 import com.livingtechusa.gotjokes.data.api.model.YoMamma
+import com.livingtechusa.gotjokes.network.ChuckNorrisApiService
 import com.livingtechusa.gotjokes.network.ImgFlipApi
+import com.livingtechusa.gotjokes.network.MemeMakerApi
+import com.livingtechusa.gotjokes.network.RandomFactsApiService
 import com.livingtechusa.gotjokes.network.YoMammaApi
-import com.livingtechusa.gotjokes.network.YodaService
+import com.livingtechusa.gotjokes.network.YodaApiService
 import com.livingtechusa.gotjokes.ui.build.BuildEvent.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,6 +36,16 @@ class BuildViewModel() : ViewModel() {
     private val _imgFlipMeme = MutableStateFlow(ImgFlip.Data.Meme.buildFromJson(null))
     val imgFlipMeme: StateFlow<ImgFlip.Data.Meme?> get() = _imgFlipMeme
 
+    private val _memeMakerDataList = MutableStateFlow(emptyList<MemeMakerImage.Data>())
+    val memeMakerDataList: StateFlow<List<MemeMakerImage.Data>> get() = _memeMakerDataList
+
+    private val _imageList = MutableStateFlow(emptyList<String>())
+    val imageList: StateFlow<List<String>> get() = _imageList
+
+    private val _imageUrl = MutableStateFlow(String())
+    val imageUrl: StateFlow<String?> get() = _imageUrl
+
+
     private val _caption = MutableStateFlow(String())
     val caption: StateFlow<String> get() = _caption
 
@@ -38,6 +54,14 @@ class BuildViewModel() : ViewModel() {
 
     private val _yoMamma = MutableStateFlow(YoMamma(null))
     val yoMamma: StateFlow<YoMamma> get() = _yoMamma
+
+    private val _randomFact = MutableStateFlow(RandomFact())
+    val randomFact: StateFlow<RandomFact> get() = _randomFact
+
+    private val _chuckNorrisJoke = MutableStateFlow(ChuckNorris())
+    val chuckNorrisJoke: StateFlow<ChuckNorris> get() = _chuckNorrisJoke
+
+
 
     private val _joke = MutableStateFlow(Joke())
     var joke: StateFlow<Joke> = _joke
@@ -48,8 +72,10 @@ class BuildViewModel() : ViewModel() {
 
     init {
         _loading = true
-        getImgFlipPhotos()
+        getImages()
         getYoMammaJokes()
+        getRandomFacts()
+        getChuckNorrisJokes()
         //        if (state.get<String>(STATE_KEY_URL) == "com.livingtechusa.gotjokes.ui.build.joke.url") {
         //            state.get<String>(STATE_KEY_URL)?.let { imgFlipUrl ->
         //                joke.image = imgFlipUrl
@@ -67,13 +93,17 @@ class BuildViewModel() : ViewModel() {
                 when (event) {
                     is GetImgFlipImages -> {
                         _caption.value = ""
-                        getImgFlipImageList()
+                        getImageList()
                         getYoMammaJokes()
+                        getRandomFacts()
+                        getChuckNorrisJokes()
                     }
                     is GetNewImgFlipImage -> {
                         _caption.value = ""
-                        getImgFlipImage()
+                        getImage()
                         getYoMammaJokes()
+                        getRandomFacts()
+                        getChuckNorrisJokes()
                     }
                     is ConvertToYodaSpeak -> {
                         ConvertToTextToYodaSpeak(event.text)
@@ -95,13 +125,42 @@ class BuildViewModel() : ViewModel() {
      * Gets  photos from the ImgFlip API Retrofit service and updates the
      * [ImageFlipPhotos] [List] [LiveData].
      */
-    private fun getImgFlipPhotos() {
+    private fun getImages() {
         viewModelScope.launch {
-            val listResult = ImgFlipApi.retrofitService.getImgFlipMeme()
-            _imgFlipMemeList.value = listResult.data.memes
-            getImgFlipImage()
+            val images = mutableListOf<String>()
+            val imgFlipResult = ImgFlipApi.retrofitService.getImgFlipMeme()
+            for(url in imgFlipResult.data.memes){
+                images.add(url.url)
+            }
+            val memeMakerResult = MemeMakerApi.retrofitService.getMemeMakerImage()
+            for (url in memeMakerResult.data){
+                if(url.image.toString().endsWith(".jpg") || url.image.toString().endsWith(".png")) {
+                        url.image?.let { images.add(it) }
+                    }
+            }
+            _imageList.value = images
+            getImage()
             _loading = false
         }
+    }
+
+    private fun getImage() {
+        if (_imageList.value.size > 0) {
+            val rand = (0.._imageList.value.size - 1).shuffled().last()
+            val imageUrl = imageList.value[rand]
+            _imageUrl.value = imageUrl
+        } else {
+            getImageList()
+        }
+    }
+
+    private fun getImageList() {
+        _loading = true
+        getImages()
+        val rand = (0.._imageList.value.size - 1).shuffled().first()
+        val imageURL = imageList.value.get(rand)
+        _imageUrl.value = imageURL
+        _loading = false
     }
 
     /**
@@ -110,8 +169,12 @@ class BuildViewModel() : ViewModel() {
      */
     private fun getYoMammaJokes() {
         viewModelScope.launch {
-            val result = YoMammaApi.retrofitService.getYoMammaJoke()
-            _yoMamma.value = result
+            try {
+                val result = YoMammaApi.retrofitService.getYoMammaJoke()
+                _yoMamma.value = result
+            } catch(e: Exception){
+                Log.i("YoMamma", e.message + " with cause " +e.cause)
+            }
             _loading = false
         }
     }
@@ -119,37 +182,44 @@ class BuildViewModel() : ViewModel() {
     private fun ConvertToTextToYodaSpeak(text: String) {
         viewModelScope.launch {
             try {
-                val result = YodaService.YodaSpeakApi.retrofitService.getYodaSpeak(text)
+                val result = YodaApiService.YodaSpeakApi.retrofitService.getYodaSpeak(text)
                 _caption.value = result?.contents?.translated ?: "Too many tries."
             } catch (e: Exception) {
                 Log.i("Yoda", e.message + " with cause " + e.cause)
                 _caption.value = "Sorry, Yoda only speaks 5 times an hour."
             }
+            _loading = false
         }
     }
 
-    private fun getImgFlipImage() {
-        if (_imgFlipMemeList.value.size > 0) {
-            val rand = (0.._imgFlipMemeList.value.size - 1).shuffled().last()
-            val meme = _imgFlipMemeList.value[rand]
-            _imgFlipMeme.value = meme
-        } else {
-            getImgFlipImageList()
+    private fun getRandomFacts() {
+        viewModelScope.launch {
+            try {
+                val result = RandomFactsApiService.RandomFactsApi.retrofitService.getRandomFacts()
+                if (result != null) {
+                _randomFact.value = result
+                }
+            } catch (e: Exception) {
+                Log.i("RandomFact", e.message + " with cause " + e.cause)
+                _randomFact.value = RandomFact()
+            }
+            _loading = false
         }
     }
 
-    private fun getImgFlipImageList() {
-        _loading = true
-        getImgFlipPhotos()
-        val rand = (0.._imgFlipMemeList.value.size - 1).shuffled().last()
-        val meme = imgFlipMemeList.value.get(rand)
-        _imgFlipMeme.value = meme
-        _loading = false
+    private fun getChuckNorrisJokes() {
+        viewModelScope.launch {
+            try {
+                val result = ChuckNorrisApiService.ChuckNorrisApi.retrofitService.getChuckNorrisJoke()
+                if (result != null) {
+                    _chuckNorrisJoke.value = result
+                }
+            } catch (e: Exception) {
+                Log.i("RandomFact", e.message + " with cause " + e.cause)
+                _chuckNorrisJoke.value = ChuckNorris()
+            }
+            _loading = false
+        }
     }
-
-    //notify on user input
-    //    fun UiUpdatedByUser(joke: Joke, bool: Boolean) {
-    //        _joke.chuckNorris = "Bad Ass"
-    //    }
 
 }
