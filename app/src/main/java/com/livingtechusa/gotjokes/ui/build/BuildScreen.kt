@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
@@ -61,7 +62,8 @@ fun BuildScreen() {
 
     JokesTheme() {
         Scaffold(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .fillMaxWidth()
                 .padding(25.dp),
             scaffoldState = scaffoldState,
@@ -89,7 +91,8 @@ fun BuildScreen() {
                     title = {
                         Text(
                             modifier = Modifier
-                                .fillMaxWidth(),
+                                .fillMaxWidth()
+                                .wrapContentWidth(align = Alignment.CenterHorizontally),
                             text = "Got Jokes?"
                         )
                     },
@@ -138,7 +141,7 @@ fun BuildScreen() {
                                 onValueChange = {
                                     buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(it))
                                 },
-                                label = { Text("Caption") }
+                                label = { Text("Caption: What's your best idea?") }
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             ClickableText(
@@ -148,6 +151,11 @@ fun BuildScreen() {
                                     buildViewModel.onTriggerEvent(BuildEvent.ConvertToYodaSpeak(caption))
                                 }
                             )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "Bad jokes...",
+                                fontWeight = FontWeight.Bold
+                            )
                             // YoMamma Joke
                             Spacer(modifier = Modifier.height(16.dp))
                             ClickableText(
@@ -155,15 +163,6 @@ fun BuildScreen() {
                                 text = AnnotatedString(yoMamma.joke ?: "YoMamma is unavaliable now."),
                                 onClick = {
                                     buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(yoMamma.joke.toString()))
-                                }
-                            )
-                            // Random fact
-                            Spacer(modifier = Modifier.height(16.dp))
-                            ClickableText(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = AnnotatedString(randomFact.text ?: "Nuttin ta see here."),
-                                onClick = {
-                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(randomFact.text))
                                 }
                             )
                             // Dad Joke
@@ -176,6 +175,21 @@ fun BuildScreen() {
                                     buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(dadJoke.attachments.get(0).text))
                                 }
                             )
+                            // Chuck Norris Joke
+                            Spacer(modifier = Modifier.height(16.dp))
+                            val chuckNorris = if( chuckNorrisJoke.value.isEmpty().not()) chuckNorrisJoke.value else null
+                            ClickableText(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = AnnotatedString(chuckNorris ?: "Nuttin here 'bout Chuck'."),
+                                onClick = {
+                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(chuckNorrisJoke.value))
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "Good advice...",
+                                fontWeight = FontWeight.Bold
+                            )
                             // Advice
                             Spacer(modifier = Modifier.height(16.dp))
                             val adviceString: String? = if(advice.slip.advice.isEmpty().not()) advice.slip.advice else null
@@ -186,14 +200,18 @@ fun BuildScreen() {
                                     buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(adviceString ?: "No advice is sometimes the best."))
                                 }
                             )
-                            // Chuck Norris Joke
                             Spacer(modifier = Modifier.height(16.dp))
-                            val chuckNorris = if( chuckNorrisJoke.value.isEmpty().not()) chuckNorrisJoke.value else null
+                            Text(
+                                text = "Did you know...?",
+                                fontWeight = FontWeight.Bold
+                            )
+                            // Random fact
+                            Spacer(modifier = Modifier.height(16.dp))
                             ClickableText(
                                 modifier = Modifier.fillMaxWidth(),
-                                text = AnnotatedString(chuckNorris ?: "Nuttin here 'bout Chuck'."),
+                                text = AnnotatedString(randomFact.text ?: "Nuttin ta see here."),
                                 onClick = {
-                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(chuckNorrisJoke.value))
+                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(randomFact.text))
                                 }
                             )
                             // Cat Fact
