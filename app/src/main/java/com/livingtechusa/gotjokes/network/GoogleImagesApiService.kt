@@ -19,11 +19,11 @@ private val googleImageRetrofit = Retrofit.Builder()
  * A public interface that exposes the [getGoogleImages] method
  */
 interface GoogleImagesApiService { // id=07f5aa9fbf617a226 key=AIzaSyAw4gfjQSBxieq3NGg8iydmlcjkdrOC_74
-    @GET("v1?key=AIzaSyAw4gfjQSBxieq3NGg8iydmlcjkdrOC_74&searchtype=image&cx=07f5aa9fbf617a226&q=funny%20pictures")
+    @GET("v1?key=AIzaSyAw4gfjQSBxieq3NGg8iydmlcjkdrOC_74&searchtype=image&cx=07f5aa9fbf617a226&q=funny%20image")
     suspend fun getGoogleImages(): GoogleImages
 
-    @GET("v1?key=AIzaSyAw4gfjQSBxieq3NGg8iydmlcjkdrOC_74&searchtype=image&cx=07f5aa9fbf617a226&q=funny%20image")
-    suspend fun getNextPageGoogleImages(url: String): GoogleImages
+    @GET("v1?key=AIzaSyAw4gfjQSBxieq3NGg8iydmlcjkdrOC_74&searchtype=image&cx=07f5aa9fbf617a226&q=funny%20image&hl=en&tbs&sa=X&ved=0CAEQpwVqFwoTCMiwiZHN-fgCFQAAAAAdAAAAABAF")
+    suspend fun getNextPageGoogleImages(): GoogleImages
 }
 
 /**
