@@ -6,12 +6,11 @@ import androidx.lifecycle.*
 import com.livingtechusa.gotjokes.data.api.model.ChuckNorris
 import com.livingtechusa.gotjokes.data.api.model.Joke
 import com.livingtechusa.gotjokes.data.api.model.ImgFlip
-import com.livingtechusa.gotjokes.data.api.model.MemeMakerImage
 import com.livingtechusa.gotjokes.data.api.model.RandomFact
 import com.livingtechusa.gotjokes.data.api.model.YoMamma
 import com.livingtechusa.gotjokes.network.ChuckNorrisApiService
+import com.livingtechusa.gotjokes.network.GoogleImageApi
 import com.livingtechusa.gotjokes.network.ImgFlipApi
-import com.livingtechusa.gotjokes.network.MemeMakerApi
 import com.livingtechusa.gotjokes.network.RandomFactsApiService
 import com.livingtechusa.gotjokes.network.YoMammaApi
 import com.livingtechusa.gotjokes.network.YodaApiService
@@ -35,9 +34,9 @@ class BuildViewModel() : ViewModel() {
 
     private val _imgFlipMeme = MutableStateFlow(ImgFlip.Data.Meme.buildFromJson(null))
     val imgFlipMeme: StateFlow<ImgFlip.Data.Meme?> get() = _imgFlipMeme
-
-    private val _memeMakerDataList = MutableStateFlow(emptyList<MemeMakerImage.Data>())
-    val memeMakerDataList: StateFlow<List<MemeMakerImage.Data>> get() = _memeMakerDataList
+//
+//    private val _memeMakerDataList = MutableStateFlow(emptyList<MemeMakerImage.Data>())
+//    val memeMakerDataList: StateFlow<List<MemeMakerImage.Data>> get() = _memeMakerDataList
 
     private val _imageList = MutableStateFlow(emptyList<String>())
     val imageList: StateFlow<List<String>> get() = _imageList
@@ -132,11 +131,15 @@ class BuildViewModel() : ViewModel() {
             for(url in imgFlipResult.data.memes){
                 images.add(url.url)
             }
-            val memeMakerResult = MemeMakerApi.retrofitService.getMemeMakerImage()
-            for (url in memeMakerResult.data){
-                if(url.image.toString().endsWith(".jpg") || url.image.toString().endsWith(".png")) {
-                        url.image?.let { images.add(it) }
+            val googleImageResult = GoogleImageApi.retrofitService.getGoogleImages()
+            for (item in googleImageResult.items    ){
+                if(item.pagemap.imageobject?.listIterator() != null) {
+                    for (tag in item.pagemap.imageobject.listIterator()) {
+                        if(!tag.url.contains("logo")) {
+                            images.add(tag.url)
+                        }
                     }
+                }
             }
             _imageList.value = images
             getImage()
@@ -146,7 +149,7 @@ class BuildViewModel() : ViewModel() {
 
     private fun getImage() {
         if (_imageList.value.size > 0) {
-            val rand = (0.._imageList.value.size - 1).shuffled().last()
+            val rand = (0.._imageList.value.size - 1).shuffled().first()
             val imageUrl = imageList.value[rand]
             _imageUrl.value = imageUrl
         } else {
