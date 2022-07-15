@@ -10,4 +10,8 @@ sealed class BuildEvent {
     data class UpdateCaption(
         val text: String
     ): BuildEvent()
+    data class Save(
+        val url: String,
+        val text: String
+    ): BuildEvent()
 }

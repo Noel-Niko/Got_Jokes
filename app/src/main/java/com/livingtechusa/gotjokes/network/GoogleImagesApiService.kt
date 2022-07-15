@@ -1,5 +1,8 @@
 package com.livingtechusa.gotjokes.network
 
+import com.livingtechusa.gotjokes.data.api.ApiConstants.BASE_URL_GOOGLE_IMAGE
+import com.livingtechusa.gotjokes.data.api.ApiConstants.END_POINT_GOOGLE_IMAGE1
+import com.livingtechusa.gotjokes.data.api.ApiConstants.END_POINT_GOOGLE_IMAGE2
 import com.livingtechusa.gotjokes.data.api.model.GoogleImages
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -12,17 +15,17 @@ import retrofit2.http.GET
  */
 private val googleImageRetrofit = Retrofit.Builder()
     .addConverterFactory(MoshiConverterFactory.create().asLenient())
-    .baseUrl(  "https://www.googleapis.com/customsearch/")   //"https://cse.google.com/cse/element/")
+    .baseUrl(  BASE_URL_GOOGLE_IMAGE)
     .build()
 
 /**
  * A public interface that exposes the [getGoogleImages] method
  */
 interface GoogleImagesApiService { // id=07f5aa9fbf617a226 key=AIzaSyAw4gfjQSBxieq3NGg8iydmlcjkdrOC_74
-    @GET("v1?key=AIzaSyAw4gfjQSBxieq3NGg8iydmlcjkdrOC_74&searchtype=image&cx=07f5aa9fbf617a226&q=funny%20image")
+    @GET(END_POINT_GOOGLE_IMAGE1)
     suspend fun getGoogleImages(): GoogleImages
 
-    @GET("v1?key=AIzaSyAw4gfjQSBxieq3NGg8iydmlcjkdrOC_74&searchtype=image&cx=07f5aa9fbf617a226&q=funny%20image&hl=en&tbs&sa=X&ved=0CAEQpwVqFwoTCMiwiZHN-fgCFQAAAAAdAAAAABAF")
+    @GET(END_POINT_GOOGLE_IMAGE2)
     suspend fun getNextPageGoogleImages(): GoogleImages
 }
 

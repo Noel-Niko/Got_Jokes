@@ -3,9 +3,12 @@ package com.livingtechusa.gotjokes.ui.build
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
+import com.livingtechusa.gotjokes.data.api.model.Advice
+import com.livingtechusa.gotjokes.data.api.model.CatFact
 import com.livingtechusa.gotjokes.data.api.model.ChuckNorris
+import com.livingtechusa.gotjokes.data.api.model.DadJokes
+import com.livingtechusa.gotjokes.data.api.model.DogFact
 import com.livingtechusa.gotjokes.data.api.model.Joke
-import com.livingtechusa.gotjokes.data.api.model.ImgFlip
 import com.livingtechusa.gotjokes.data.api.model.RandomFact
 import com.livingtechusa.gotjokes.data.api.model.YoMamma
 import com.livingtechusa.gotjokes.network.ChuckNorrisApiService
@@ -14,6 +17,10 @@ import com.livingtechusa.gotjokes.network.ImgFlipApi
 import com.livingtechusa.gotjokes.network.RandomFactsApiService
 import com.livingtechusa.gotjokes.network.YoMammaApi
 import com.livingtechusa.gotjokes.network.YodaApiService
+import com.livingtechusa.gotjokes.network.AdviceApiService
+import com.livingtechusa.gotjokes.network.CatFactApiService
+import com.livingtechusa.gotjokes.network.DadJokeApiService
+import com.livingtechusa.gotjokes.network.DogFactApiService
 import com.livingtechusa.gotjokes.ui.build.BuildEvent.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,21 +36,11 @@ class BuildViewModel() : ViewModel() {
     //    val status: StateFlow<ApiStatus>
     //        get() = _status
 
-    private val _imgFlipMemeList = MutableStateFlow(emptyList<ImgFlip.Data.Meme>())
-    val imgFlipMemeList: StateFlow<List<ImgFlip.Data.Meme>> get() = _imgFlipMemeList
-
-    private val _imgFlipMeme = MutableStateFlow(ImgFlip.Data.Meme.buildFromJson(null))
-    val imgFlipMeme: StateFlow<ImgFlip.Data.Meme?> get() = _imgFlipMeme
-//
-//    private val _memeMakerDataList = MutableStateFlow(emptyList<MemeMakerImage.Data>())
-//    val memeMakerDataList: StateFlow<List<MemeMakerImage.Data>> get() = _memeMakerDataList
-
     private val _imageList = MutableStateFlow(emptyList<String>())
     val imageList: StateFlow<List<String>> get() = _imageList
 
     private val _imageUrl = MutableStateFlow(String())
     val imageUrl: StateFlow<String?> get() = _imageUrl
-
 
     private val _caption = MutableStateFlow(String())
     val caption: StateFlow<String> get() = _caption
@@ -60,7 +57,17 @@ class BuildViewModel() : ViewModel() {
     private val _chuckNorrisJoke = MutableStateFlow(ChuckNorris())
     val chuckNorrisJoke: StateFlow<ChuckNorris> get() = _chuckNorrisJoke
 
+    private val _advice = MutableStateFlow(Advice())
+    val advice: StateFlow<Advice> get() = _advice
 
+    private val _dadJoke = MutableStateFlow(DadJokes())
+    val dadJoke: StateFlow<DadJokes> get() = _dadJoke
+
+    private val _catFact = MutableStateFlow(CatFact())
+    val catFact: StateFlow<CatFact> get() = _catFact
+
+    private val _dogFact = MutableStateFlow(DogFact())
+    val dogFact: StateFlow<DogFact> get() = _dogFact
 
     private val _joke = MutableStateFlow(Joke())
     var joke: StateFlow<Joke> = _joke
@@ -75,6 +82,11 @@ class BuildViewModel() : ViewModel() {
         getYoMammaJokes()
         getRandomFacts()
         getChuckNorrisJokes()
+        getAdvice()
+        getDadJoke()
+        getCatFact()
+        getDogFact()
+
         //        if (state.get<String>(STATE_KEY_URL) == "com.livingtechusa.gotjokes.ui.build.joke.url") {
         //            state.get<String>(STATE_KEY_URL)?.let { imgFlipUrl ->
         //                joke.image = imgFlipUrl
@@ -96,6 +108,10 @@ class BuildViewModel() : ViewModel() {
                         getYoMammaJokes()
                         getRandomFacts()
                         getChuckNorrisJokes()
+                        getAdvice()
+                        getDadJoke()
+                        getCatFact()
+                        getDogFact()
                     }
                     is GetNewImgFlipImage -> {
                         _caption.value = ""
@@ -103,12 +119,19 @@ class BuildViewModel() : ViewModel() {
                         getYoMammaJokes()
                         getRandomFacts()
                         getChuckNorrisJokes()
+                        getAdvice()
+                        getDadJoke()
+                        getCatFact()
+                        getDogFact()
                     }
                     is ConvertToYodaSpeak -> {
                         ConvertToTextToYodaSpeak(event.text)
                     }
                     is UpdateCaption -> {
                         _caption.value = event.text
+                    }
+                    is Save -> {
+
                     }
                 }
             } catch (e: Exception) {
@@ -228,11 +251,71 @@ class BuildViewModel() : ViewModel() {
                     _chuckNorrisJoke.value = result
                 }
             } catch (e: Exception) {
-                Log.i("RandomFact", e.message + " with cause " + e.cause)
+                Log.i("Chuck Norris", e.message + " with cause " + e.cause)
                 _chuckNorrisJoke.value = ChuckNorris()
             }
             _loading = false
         }
     }
+
+    private fun getAdvice() {
+        viewModelScope.launch {
+            try {
+                val result = AdviceApiService.AdviceApi.retrofitService.getadviceJoke()
+                if (result != null) {
+                    _advice.value = result
+                }
+            } catch (e: Exception) {
+                Log.i("Advice", e.message + " with cause " + e.cause)
+                _advice.value = Advice()
+            }
+            _loading = false
+        }
+    }
+
+    private fun getDadJoke() {
+        viewModelScope.launch {
+            try {
+                val result = DadJokeApiService.DadJokeApi.retrofitService.getdadJoke()
+                if (result != null) {
+                    _dadJoke.value = result
+                }
+            } catch (e: Exception) {
+                Log.i("Dad Joke", e.message + " with cause " + e.cause)
+                _dadJoke.value = DadJokes()
+            }
+            _loading = false
+        }
+    }
+    private fun getCatFact() {
+        viewModelScope.launch {
+            try {
+                val result = CatFactApiService.CatFactApi.retrofitService.getcatFact()
+                if (result != null) {
+                    _catFact.value = result
+                }
+            } catch (e: Exception) {
+                Log.i("Cat Fact", e.message + " with cause " + e.cause)
+                _catFact.value = CatFact()
+            }
+            _loading = false
+        }
+    }
+
+    private fun getDogFact() {
+        viewModelScope.launch {
+            try {
+                val result = DogFactApiService.DogFactApi.retrofitService.getDogFact()
+                if (result != null) {
+                    _dogFact.value = result
+                }
+            } catch (e: Exception) {
+                Log.i("Cat Fact", e.message + " with cause " + e.cause)
+                _dogFact.value = DogFact()
+            }
+            _loading = false
+        }
+    }
+
 
 }
