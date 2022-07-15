@@ -141,6 +141,16 @@ class BuildViewModel() : ViewModel() {
                     }
                 }
             }
+            val googleImageResult2 = GoogleImageApi.retrofitService.getNextPageGoogleImages()
+            for (item in googleImageResult2.items    ){
+                if(item.pagemap.imageobject?.listIterator() != null) {
+                    for (tag in item.pagemap.imageobject.listIterator()) {
+                        if(!tag.url.contains("logo")) {
+                            images.add(tag.url)
+                        }
+                    }
+                }
+            }
             _imageList.value = images
             getImage()
             _loading = false
