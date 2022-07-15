@@ -1,6 +1,5 @@
 package com.livingtechusa.gotjokes.ui.build
 
-import android.widget.ImageView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,9 +26,6 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,19 +34,19 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.livingtechusa.gotjokes.data.api.model.ImgFlip
-import com.livingtechusa.gotjokes.data.api.model.YoMamma
 import com.livingtechusa.gotjokes.ui.theme.JokesTheme
 
 
 @Composable
 fun BuildScreen() {
     val buildViewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
-    val image by buildViewModel.imgFlipMeme.collectAsState()
-    val yoMamma by buildViewModel.yoMamma.collectAsState()
     val caption by buildViewModel.caption.collectAsState()
+    val image by buildViewModel.imageUrl.collectAsState()
+    val yoMamma by buildViewModel.yoMamma.collectAsState()
+    val randomFact by buildViewModel.randomFact.collectAsState()
+    val chuckNorrisJoke by buildViewModel.chuckNorrisJoke.collectAsState()
     val scaffoldState = rememberScaffoldState()
 
     JokesTheme() {
@@ -93,7 +89,7 @@ fun BuildScreen() {
                 //TODO: reduce to one randomly selected picture
                 // add placeholders for the text
                 //animate the progress icon to be 3 dots moving
-                if (image?.url == null && yoMamma?.joke == null) {
+                if (image == null && yoMamma.joke == null) {
                     item {
                         Column(
                             modifier = Modifier
@@ -113,7 +109,7 @@ fun BuildScreen() {
                         ) {
                             Spacer(Modifier.height(16.dp))
                             if (image != null) {
-                                MemeImgCard(meme = image!!)
+                                MemeImgCard(url = image!!)
                             }
                             Spacer(modifier = Modifier.height(16.dp))
                             TextField(
@@ -132,6 +128,7 @@ fun BuildScreen() {
                                     buildViewModel.onTriggerEvent(BuildEvent.ConvertToYodaSpeak(caption))
                                 }
                             )
+                            // YoMamma Joke
                             Spacer(modifier = Modifier.height(16.dp))
                             ClickableText(
                                 modifier = Modifier.fillMaxWidth(),
@@ -139,7 +136,24 @@ fun BuildScreen() {
                                 onClick = {
                                     buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(yoMamma.joke.toString()))
                                 }
-
+                            )
+                            // Random fact
+                            Spacer(modifier = Modifier.height(16.dp))
+                            ClickableText(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = AnnotatedString(randomFact.text ?: "Nuttin ta see here."),
+                                onClick = {
+                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(randomFact.text))
+                                }
+                            )
+                            // Chuck Norris Joke
+                            Spacer(modifier = Modifier.height(16.dp))
+                            ClickableText(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = AnnotatedString(chuckNorrisJoke.value ?: "Nuttin ta see here."),
+                                onClick = {
+                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(chuckNorrisJoke.value))
+                                }
                             )
                         }
                     }
@@ -152,9 +166,9 @@ fun BuildScreen() {
 
 
 @Composable
-fun MemeImgCard(meme: ImgFlip.Data.Meme) {
-    val imagePainter = rememberImagePainter(     //data = meme.url, )
-        data = meme.url,
+fun MemeImgCard(url: String) {
+    val imagePainter = rememberImagePainter(
+        data = url,
         builder = {
             allowHardware(false)
         }
