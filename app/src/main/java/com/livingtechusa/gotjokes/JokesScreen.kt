@@ -1,0 +1,47 @@
+package com.livingtechusa.gotjokes
+
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.MoneyOff
+import androidx.compose.material.icons.filled.PieChart
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.livingtechusa.gotjokes.ui.build.BuildScreen
+
+/**
+ * Screen metadata for Rally.
+ */
+enum class JokesScreen(
+    val icon: ImageVector,
+    val body: @Composable ((String) -> Unit) -> Unit
+) {
+    Build(
+        icon = Icons.Filled.PieChart,
+        body = {  BuildScreen() }
+    ),
+    Display(
+        icon = Icons.Filled.AttachMoney,
+        body = { com.livingtechusa.gotjokes.ui.display.DisplayScreen() }
+    ),
+    Save(
+        icon = Icons.Filled.MoneyOff,
+        body = { com.livingtechusa.gotjokes.ui.saved.SavedScreen() }
+    );
+
+    @Composable
+    fun content(onScreenChange: (String) -> Unit) {
+        body(onScreenChange)
+    }
+
+    companion object {
+        fun fromRoute(route: String?): JokesScreen =
+            when (route?.substringBefore("/")) {
+                Build.name -> Build
+                Display.name -> Display
+                Save.name -> Save
+                null -> Build
+                else -> throw IllegalArgumentException("Route $route is not recognized.")
+            }
+    }
+}

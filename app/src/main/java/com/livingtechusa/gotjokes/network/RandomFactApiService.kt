@@ -8,6 +8,7 @@ import retrofit2.http.GET
 
 
 private val randomFactsRetrofit = Retrofit.Builder()
+    .client(okClient)
     .addConverterFactory(MoshiConverterFactory.create())
     .baseUrl(ApiConstants.BASE_URL_RANDOM_FACTS)
     .build()

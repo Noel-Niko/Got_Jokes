@@ -1,17 +1,23 @@
 package com.livingtechusa.gotjokes.ui.build
 
+import android.os.Bundle
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
+import androidx.navigation.compose.rememberNavController
+import com.livingtechusa.gotjokes.Display
+import com.livingtechusa.gotjokes.Saved
 import com.livingtechusa.gotjokes.data.api.model.Advice
 import com.livingtechusa.gotjokes.data.api.model.CatFact
 import com.livingtechusa.gotjokes.data.api.model.ChuckNorris
 import com.livingtechusa.gotjokes.data.api.model.DadJokes
 import com.livingtechusa.gotjokes.data.api.model.DogFact
 import com.livingtechusa.gotjokes.data.api.model.Joke
+import com.livingtechusa.gotjokes.data.api.model.JokeApi
 import com.livingtechusa.gotjokes.data.api.model.RandomFact
 import com.livingtechusa.gotjokes.data.api.model.YoMamma
-import com.livingtechusa.gotjokes.network.ChuckNorrisApiService
+import com.livingtechusa.gotjokes.navigateSingleTopTo
+import com.livingtechusa.gotjokes.network.JokeApiService
 import com.livingtechusa.gotjokes.network.GoogleImageApi
 import com.livingtechusa.gotjokes.network.ImgFlipApi
 import com.livingtechusa.gotjokes.network.RandomFactsApiService
@@ -54,8 +60,8 @@ class BuildViewModel() : ViewModel() {
     private val _randomFact = MutableStateFlow(RandomFact())
     val randomFact: StateFlow<RandomFact> get() = _randomFact
 
-    private val _chuckNorrisJoke = MutableStateFlow(ChuckNorris())
-    val chuckNorrisJoke: StateFlow<ChuckNorris> get() = _chuckNorrisJoke
+    private val _jokeApiJoke = MutableStateFlow(JokeApi())
+    val jokeApiJoke: StateFlow<JokeApi> get() = _jokeApiJoke
 
     private val _advice = MutableStateFlow(Advice())
     val advice: StateFlow<Advice> get() = _advice
@@ -76,12 +82,13 @@ class BuildViewModel() : ViewModel() {
     val loading: Boolean get() = _loading
 
 
+
     init {
         _loading = true
         getImages()
         getYoMammaJokes()
         getRandomFacts()
-        getChuckNorrisJokes()
+        getjokeApiJoke()
         getAdvice()
         getDadJoke()
         getCatFact()
@@ -107,7 +114,7 @@ class BuildViewModel() : ViewModel() {
                         getImageList()
                         getYoMammaJokes()
                         getRandomFacts()
-                        getChuckNorrisJokes()
+                        getjokeApiJoke()
                         getAdvice()
                         getDadJoke()
                         getCatFact()
@@ -118,7 +125,7 @@ class BuildViewModel() : ViewModel() {
                         getImage()
                         getYoMammaJokes()
                         getRandomFacts()
-                        getChuckNorrisJokes()
+                        getjokeApiJoke()
                         getAdvice()
                         getDadJoke()
                         getCatFact()
@@ -130,13 +137,11 @@ class BuildViewModel() : ViewModel() {
                     is UpdateCaption -> {
                         _caption.value = event.text
                     }
-                    is Save -> {
-
-                    }
                 }
+
             } catch (e: Exception) {
                 Log.e(
-                    "BuildViewModel - ImgFlip: ",
+                    "BuildViewModel: ",
                     "Exception: ${e.message}  with cause: ${e.cause}"
                 )
             }
@@ -243,16 +248,16 @@ class BuildViewModel() : ViewModel() {
         }
     }
 
-    private fun getChuckNorrisJokes() {
+    private fun getjokeApiJoke() {
         viewModelScope.launch {
             try {
-                val result = ChuckNorrisApiService.ChuckNorrisApi.retrofitService.getChuckNorrisJoke()
+                val result = JokeApiService.JokeApi.retrofitService.getJokeApiJoke()
                 if (result != null) {
-                    _chuckNorrisJoke.value = result
+                    _jokeApiJoke.value = result
                 }
             } catch (e: Exception) {
-                Log.i("Chuck Norris", e.message + " with cause " + e.cause)
-                _chuckNorrisJoke.value = ChuckNorris()
+                Log.i("JokeApiJoke", e.message + " with cause " + e.cause)
+                _jokeApiJoke.value = JokeApi()
             }
             _loading = false
         }

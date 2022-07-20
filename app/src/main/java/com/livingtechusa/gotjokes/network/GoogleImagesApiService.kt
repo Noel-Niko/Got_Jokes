@@ -14,8 +14,9 @@ import retrofit2.http.GET
  * object.
  */
 private val googleImageRetrofit = Retrofit.Builder()
+    .client(okClient)
     .addConverterFactory(MoshiConverterFactory.create().asLenient())
-    .baseUrl(  BASE_URL_GOOGLE_IMAGE)
+    .baseUrl(BASE_URL_GOOGLE_IMAGE)
     .build()
 
 /**

@@ -8,6 +8,7 @@ import retrofit2.http.GET
 
 
 private val dogFactRetrofit = Retrofit.Builder()
+    .client(okClient)
     .addConverterFactory(MoshiConverterFactory.create())
     .baseUrl(ApiConstants.BASE_URL_DOG_FACTS)
     .build()

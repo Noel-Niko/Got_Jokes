@@ -12,6 +12,7 @@ import retrofit2.http.GET
  * object.
  */
 private val imgFlipRetrofit = Retrofit.Builder()
+    .client(okClient)
     .addConverterFactory(MoshiConverterFactory.create())
     .baseUrl(BASE_URL_IMGFLIP)
     .build()

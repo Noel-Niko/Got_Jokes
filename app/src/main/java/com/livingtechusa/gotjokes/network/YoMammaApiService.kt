@@ -10,6 +10,7 @@ import retrofit2.http.GET
 
 
 private val yoMammaRetrofit = Retrofit.Builder()
+    .client(okClient)
     .addConverterFactory(MoshiConverterFactory.create())
     .baseUrl(BASE_URL_YOMAMMA)
     .build()
