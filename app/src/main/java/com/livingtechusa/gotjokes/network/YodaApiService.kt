@@ -10,6 +10,7 @@ import retrofit2.http.Query
 
 
 private val yodaRetrofit = Retrofit.Builder()
+    .client(okClient)
     .addConverterFactory(MoshiConverterFactory.create())
     .baseUrl(BASE_URL_YODA)
     .build()

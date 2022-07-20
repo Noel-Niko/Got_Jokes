@@ -1,5 +1,7 @@
 package com.livingtechusa.gotjokes.ui.build
 
+import androidx.navigation.NavHostController
+
 sealed class BuildEvent {
 
     object GetImgFlipImages : BuildEvent()
@@ -7,11 +9,9 @@ sealed class BuildEvent {
     data class ConvertToYodaSpeak(
         val text: String
     ) : BuildEvent()
+
     data class UpdateCaption(
         val text: String
-    ): BuildEvent()
-    data class Save(
-        val url: String,
-        val text: String
-    ): BuildEvent()
+    ) : BuildEvent()
+
 }

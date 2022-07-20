@@ -28,7 +28,6 @@ class BaseApplication : Application() {
 //        )
     }
 
-
     val isDark = mutableStateOf(false)
 
     fun toggleTheme() {
