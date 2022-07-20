@@ -33,7 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.livingtechusa.gotjokes.ui.build.BuildEvent
 import com.livingtechusa.gotjokes.ui.build.BuildViewModel
-import com.livingtechusa.gotjokes.ui.build.MemeImgCard
+import com.livingtechusa.gotjokes.ui.components.MemeImgCard
 import com.livingtechusa.gotjokes.ui.theme.JokesTheme
 
 @Composable
