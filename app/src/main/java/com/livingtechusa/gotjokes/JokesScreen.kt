@@ -35,7 +35,7 @@ enum class JokesScreen(
         icon = Icons.Filled.AddAPhoto     ,
         body = { com.livingtechusa.gotjokes.ui.display.DisplayScreen() }
     ),
-    Save(
+    Saved(
         icon = Icons.Filled.Save,
         body = { com.livingtechusa.gotjokes.ui.saved.SavedScreen() }
     );
@@ -50,7 +50,7 @@ enum class JokesScreen(
             when (route?.substringBefore("/")) {
                 Build.name -> Build
                 Display.name -> Display
-                Save.name -> Save
+                Saved.name -> Saved
                 null -> Build
                 else -> throw IllegalArgumentException("Route $route is not recognized.")
             }

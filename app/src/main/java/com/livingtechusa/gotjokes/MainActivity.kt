@@ -22,8 +22,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.livingtechusa.gotjokes.ui.build.BuildEvent
 import com.livingtechusa.gotjokes.ui.build.BuildViewModel
@@ -50,13 +48,9 @@ class MainActivity : ComponentActivity() {
 fun JokeApp() {
     val buildViewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
 
-    val configuration = LocalConfiguration.current
-    var isPortrait: Boolean = true
-
 //    val scaffoldState = rememberScaffoldState()
     JokesTheme() {
         val allScreens = JokesScreen.values().toList()
-        val allScreensLandscape = JokesScreen.values().toList()
 //        val navController = rememberNavController()
 //        val currentBackStack by navController.currentBackStackEntryAsState()
 //        val currentDestination = currentBackStack?.destination
@@ -67,20 +61,23 @@ fun JokeApp() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start,
                 ) {
-                    Column(modifier = Modifier.fillMaxWidth(0.20f)
+                    Column(modifier = Modifier.fillMaxWidth(0.2f)
                         .align(Alignment.CenterVertically)
+                        //.background(color = MaterialTheme.colors.primaryVariant)
                     ) {
                         IconButton(
                             modifier = Modifier
                                 .wrapContentWidth(align = Alignment.Start),
+                                //.background(color = MaterialTheme.colors.primaryVariant),
                             onClick = {
-                                buildViewModel.onTriggerEvent(BuildEvent.GetNewImgFlipImage)
+                                buildViewModel.onTriggerEvent(BuildEvent.GetNewImage)
                             }) {
                             Icon(Icons.Filled.Refresh, "Refresh")
                         }
                     }
-                    Column(modifier = Modifier.fillMaxWidth(0.75f)
+                    Column(modifier = Modifier.fillMaxWidth()
                         .align(Alignment.CenterVertically)
+                        //.background(color = MaterialTheme.colors.primaryVariant)
                     ) {
                             JokesTabRow(
                                 allScreens = allScreens,
@@ -120,7 +117,7 @@ fun JokeApp() {
 //        IconButton(
 //            modifier = Modifier.wrapContentWidth(align = Alignment.Start),
 //            onClick = {
-//                buildViewModel.onTriggerEvent(BuildEvent.GetNewImgFlipImage)
+//                buildViewModel.onTriggerEvent(BuildEvent.GetNewImage)
 //            }) {
 //            Icon(Icons.Filled.Refresh, "Refresh")
 //        }

@@ -1,5 +1,6 @@
 package com.livingtechusa.gotjokes.ui.build
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,7 +45,7 @@ import com.livingtechusa.gotjokes.ui.components.MemeImgCard
 @Composable
 fun BuildScreen() {
     val configuration = LocalConfiguration.current
-    if (configuration.orientation == 2) {
+    if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
         BuildScreenLandscape()
     } else {
         val buildViewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
@@ -78,7 +79,6 @@ fun BuildScreen() {
                 }
             } else {
                 item {
-                    //TODO: USE LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
                     Column(
                         modifier = Modifier
                             .fillMaxSize()

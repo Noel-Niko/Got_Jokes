@@ -1,19 +1,20 @@
 package com.livingtechusa.gotjokes.ui.build
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -31,7 +32,7 @@ import com.livingtechusa.gotjokes.ui.components.MemeImgCard
 @Composable
 fun BuildScreenLandscape() {
     val configuration = LocalConfiguration.current
-    if (configuration.orientation == 1) {
+    if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
         BuildScreen()
     } else {
         val buildViewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
@@ -45,16 +46,12 @@ fun BuildScreenLandscape() {
         val catFact by buildViewModel.catFact.collectAsState()
         val dogFact by buildViewModel.dogFact.collectAsState()
 
-        val scaffoldState = rememberScaffoldState()
-        val scrollState = rememberScrollState()
-
         val configuration = LocalConfiguration.current
-        val screenWidth = configuration.screenWidthDp.dp
 
         LazyRow(
             modifier = Modifier
                 .fillMaxSize()
-
+                .padding(16.dp)
         ) {
             // TODO: animate the progress icon to be 3 dots moving
             if (image == null && yoMamma.joke == null) {
@@ -72,36 +69,22 @@ fun BuildScreenLandscape() {
                 item {
                     Row(
                         modifier = Modifier
-                            .fillMaxSize()
                             .padding(8.dp)
                     ) {
                         Column(
                             modifier = Modifier
-                                .width(screenWidth / 3)
-                                .verticalScroll(state = scrollState)
+                                .fillMaxWidth(0.5f)
+                                .fillMaxHeight()
                         ) {
-                            Spacer(Modifier.width(16.dp))
                             if (image != null) {
                                 MemeImgCard(url = image!!)
                             }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            TextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                value = caption,
-                                onValueChange = {
-                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(it))
-                                },
-                                label = { Text("Caption: What's your best idea?") }
-                            )
                         }
-                        Column() {
-                            Spacer(modifier = Modifier.width(16.dp))
+                        Column{
+                            Spacer(modifier = Modifier.width(8.dp))
                             ClickableText(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .verticalScroll(state = scrollState),
+                                    .wrapContentWidth(),
                                 text = AnnotatedString("Convert Caption to Yoda Speak"),
                                 onClick = {
                                     buildViewModel.onTriggerEvent(BuildEvent.ConvertToYodaSpeak(caption))
@@ -115,7 +98,7 @@ fun BuildScreenLandscape() {
                             // YoMamma Joke
                             Spacer(modifier = Modifier.width(16.dp))
                             ClickableText(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.wrapContentWidth(),
                                 text = AnnotatedString(yoMamma.joke ?: "YoMamma is unavaliable now."),
                                 onClick = {
                                     buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(yoMamma.joke.toString()))
@@ -125,7 +108,7 @@ fun BuildScreenLandscape() {
                             Spacer(modifier = Modifier.width(16.dp))
                             val dadjoke = if (!dadJoke.attachments.isEmpty()) dadJoke.attachments.get(0).text else null
                             ClickableText(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.wrapContentWidth(),
                                 text = AnnotatedString(dadjoke ?: "Don't tell your momma, but Dad's off line now.."),
                                 onClick = {
                                     buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(dadJoke.attachments.get(0).text))
@@ -135,7 +118,7 @@ fun BuildScreenLandscape() {
                             Spacer(modifier = Modifier.width(16.dp))
                             val jokeApiJokeValue = if (jokeApiJoke.joke.isEmpty().not()) jokeApiJoke.joke else null
                             ClickableText(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.wrapContentWidth(),
                                 text = AnnotatedString(jokeApiJokeValue ?: "Nuttin here ta laugh about!'"),
                                 onClick = {
                                     buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(jokeApiJokeValue.toString()))
@@ -150,7 +133,7 @@ fun BuildScreenLandscape() {
                             Spacer(modifier = Modifier.width(16.dp))
                             val adviceString: String? = if (advice.slip.advice.isEmpty().not()) advice.slip.advice else null
                             ClickableText(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.wrapContentWidth(),
                                 text = AnnotatedString(adviceString ?: "No advice is sometimes the best."),
                                 onClick = {
                                     buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(adviceString ?: "No advice is sometimes the best."))
@@ -164,7 +147,7 @@ fun BuildScreenLandscape() {
                             // Random fact
                             Spacer(modifier = Modifier.width(16.dp))
                             ClickableText(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.wrapContentWidth(),
                                 text = AnnotatedString(randomFact.text ?: "Nuttin ta see here."),
                                 onClick = {
                                     buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(randomFact.text))
@@ -174,7 +157,7 @@ fun BuildScreenLandscape() {
                             Spacer(modifier = Modifier.width(16.dp))
                             val cats = if (catFact.fact.isEmpty().not()) catFact.fact else null
                             ClickableText(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.wrapContentWidth(),
                                 text = AnnotatedString(cats ?: "All out of cat facts."),
                                 onClick = {
                                     buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(catFact.fact))
@@ -184,7 +167,7 @@ fun BuildScreenLandscape() {
                             Spacer(modifier = Modifier.width(16.dp))
                             val dogs = if (dogFact.facts.isEmpty().not()) dogFact.facts[0] else null
                             ClickableText(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.wrapContentWidth(),
                                 text = AnnotatedString(dogs ?: "All out of dog gone info."),
                                 onClick = {
                                     buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(dogFact.facts[0]))

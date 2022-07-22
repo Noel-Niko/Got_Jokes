@@ -4,8 +4,8 @@ import androidx.navigation.NavHostController
 
 sealed class BuildEvent {
 
-    object GetImgFlipImages : BuildEvent()
-    object GetNewImgFlipImage : BuildEvent()
+    object GetImages : BuildEvent()
+    object GetNewImage : BuildEvent()
     data class ConvertToYodaSpeak(
         val text: String
     ) : BuildEvent()
@@ -14,4 +14,7 @@ sealed class BuildEvent {
         val text: String
     ) : BuildEvent()
 
+    object Save : BuildEvent()
+
+    object Delete : BuildEvent()
 }

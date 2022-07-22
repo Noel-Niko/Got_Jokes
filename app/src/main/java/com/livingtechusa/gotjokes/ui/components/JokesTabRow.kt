@@ -88,6 +88,7 @@ private fun JokeTab(
     )
     Row(
         modifier = Modifier
+            //.background(color = MaterialTheme.colors.primaryVariant)
             .padding(16.dp)
             .animateContentSize()
             .height(TabHeight)  //? Use  val configuration = LocalConfiguration.current val screenHeight = configuration.screenHeightDp.dp
@@ -102,7 +103,6 @@ private fun JokeTab(
                     color = Color.Unspecified
                 )
             )
-            .background(color = MaterialTheme.colors.surface)
             .clearAndSetSemantics { contentDescription = text }
     ) {
         Icon(

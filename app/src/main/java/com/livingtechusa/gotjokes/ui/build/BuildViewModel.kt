@@ -1,22 +1,16 @@
 package com.livingtechusa.gotjokes.ui.build
 
-import android.os.Bundle
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
-import androidx.navigation.compose.rememberNavController
-import com.livingtechusa.gotjokes.Display
-import com.livingtechusa.gotjokes.Saved
 import com.livingtechusa.gotjokes.data.api.model.Advice
 import com.livingtechusa.gotjokes.data.api.model.CatFact
-import com.livingtechusa.gotjokes.data.api.model.ChuckNorris
 import com.livingtechusa.gotjokes.data.api.model.DadJokes
 import com.livingtechusa.gotjokes.data.api.model.DogFact
 import com.livingtechusa.gotjokes.data.api.model.Joke
 import com.livingtechusa.gotjokes.data.api.model.JokeApi
 import com.livingtechusa.gotjokes.data.api.model.RandomFact
 import com.livingtechusa.gotjokes.data.api.model.YoMamma
-import com.livingtechusa.gotjokes.navigateSingleTopTo
 import com.livingtechusa.gotjokes.network.JokeApiService
 import com.livingtechusa.gotjokes.network.GoogleImageApi
 import com.livingtechusa.gotjokes.network.ImgFlipApi
@@ -82,7 +76,6 @@ class BuildViewModel() : ViewModel() {
     val loading: Boolean get() = _loading
 
 
-
     init {
         _loading = true
         getImages()
@@ -97,9 +90,9 @@ class BuildViewModel() : ViewModel() {
         //        if (state.get<String>(STATE_KEY_URL) == "com.livingtechusa.gotjokes.ui.build.joke.url") {
         //            state.get<String>(STATE_KEY_URL)?.let { imgFlipUrl ->
         //                joke.image = imgFlipUrl
-        //            } ?: onTriggerEvent(GetImgFlipImages)
+        //            } ?: onTriggerEvent(GetImages)
         //        } else {
-        //            onTriggerEvent(GetImgFlipImages)
+        //            onTriggerEvent(GetImages)
         //        }
 
     }
@@ -109,7 +102,7 @@ class BuildViewModel() : ViewModel() {
         viewModelScope.launch {
             try {
                 when (event) {
-                    is GetImgFlipImages -> {
+                    is GetImages -> {
                         _caption.value = ""
                         getImageList()
                         getYoMammaJokes()
@@ -120,7 +113,7 @@ class BuildViewModel() : ViewModel() {
                         getCatFact()
                         getDogFact()
                     }
-                    is GetNewImgFlipImage -> {
+                    is GetNewImage -> {
                         _caption.value = ""
                         getImage()
                         getYoMammaJokes()
@@ -136,6 +129,12 @@ class BuildViewModel() : ViewModel() {
                     }
                     is UpdateCaption -> {
                         _caption.value = event.text
+                    }
+                    is Save -> {
+
+                    }
+                    is Delete -> {
+
                     }
                 }
 
@@ -156,30 +155,34 @@ class BuildViewModel() : ViewModel() {
         viewModelScope.launch {
             val images = mutableListOf<String>()
             val imgFlipResult = ImgFlipApi.retrofitService.getImgFlipMeme()
-            for(url in imgFlipResult.data.memes){
+            for (url in imgFlipResult.data.memes) {
                 images.add(url.url)
             }
-            val googleImageResult = GoogleImageApi.retrofitService.getGoogleImages()
-            for (item in googleImageResult.items    ){
-                if(item.pagemap.imageobject?.listIterator() != null) {
-                    for (tag in item.pagemap.imageobject.listIterator()) {
-                        if(!tag.url.contains("logo")) {
-                            images.add(tag.url)
-                        }
-                    }
-                }
-            }
-            val googleImageResult2 = GoogleImageApi.retrofitService.getNextPageGoogleImages()
-            for (item in googleImageResult2.items    ){
-                if(item.pagemap.imageobject?.listIterator() != null) {
-                    for (tag in item.pagemap.imageobject.listIterator()) {
-                        if(!tag.url.contains("logo")) {
-                            images.add(tag.url)
-                        }
-                    }
-                }
-            }
-            _imageList.value = images
+//            val googleImageResult = GoogleImageApi.retrofitService.getGoogleImages()
+//            if (googleImageResult != null) {
+//                for (item in googleImageResult.items) {
+//                    if (item.pagemap.imageobject?.listIterator() != null) {
+//                        for (tag in item.pagemap.imageobject.listIterator()) {
+//                            if (!tag.url.contains("logo")) {
+//                                images.add(tag.url)
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//            val googleImageResult2 = GoogleImageApi.retrofitService.getNextPageGoogleImages()
+//            if (googleImageResult2 != null) {
+//                for (item in googleImageResult2.items) {
+//                    if (item.pagemap.imageobject?.listIterator() != null) {
+//                        for (tag in item.pagemap.imageobject.listIterator()) {
+//                            if (!tag.url.contains("logo")) {
+//                                images.add(tag.url)
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+            _imageList.value += images
             getImage()
             _loading = false
         }
@@ -213,8 +216,8 @@ class BuildViewModel() : ViewModel() {
             try {
                 val result = YoMammaApi.retrofitService.getYoMammaJoke()
                 _yoMamma.value = result
-            } catch(e: Exception){
-                Log.i("YoMamma", e.message + " with cause " +e.cause)
+            } catch (e: Exception) {
+                Log.i("YoMamma", e.message + " with cause " + e.cause)
             }
             _loading = false
         }
@@ -238,7 +241,7 @@ class BuildViewModel() : ViewModel() {
             try {
                 val result = RandomFactsApiService.RandomFactsApi.retrofitService.getRandomFacts()
                 if (result != null) {
-                _randomFact.value = result
+                    _randomFact.value = result
                 }
             } catch (e: Exception) {
                 Log.i("RandomFact", e.message + " with cause " + e.cause)
@@ -292,6 +295,7 @@ class BuildViewModel() : ViewModel() {
             _loading = false
         }
     }
+
     private fun getCatFact() {
         viewModelScope.launch {
             try {
