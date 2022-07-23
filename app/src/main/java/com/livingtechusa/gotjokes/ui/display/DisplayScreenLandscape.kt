@@ -61,9 +61,9 @@ fun DisplayScreenLandscape() {
         val scrollState = rememberScrollState()
 
         LazyRow(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+//            modifier = Modifier
+//                .width(700.dp)
+//                .padding(16.dp)
         ) {
             // TODO: animate the progress icon to be 3 dots moving
             if (image == null) {
@@ -82,15 +82,15 @@ fun DisplayScreenLandscape() {
                      Row(
                         modifier = Modifier
                         .fillMaxSize()
-                        .padding(8.dp)
+                       // .padding(8.dp)
                     ) {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth(0.5f)
-                                .padding(8.dp)
+//                            modifier = Modifier
+//                                .fillMaxWidth(0.5f)
+//                                .padding(8.dp)
                                 //.verticalScroll(state = scrollState)
                         ) {
-                            Spacer(Modifier.height(16.dp))
+                          //  Spacer(Modifier.height(16.dp))
                             if (image != null) {
                                 MemeImgCard(url = image!!)
                             }

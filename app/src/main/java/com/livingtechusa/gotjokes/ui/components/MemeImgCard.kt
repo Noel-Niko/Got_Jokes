@@ -46,7 +46,7 @@ fun MemeImgCard(url: String) {
         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             configuration.screenWidthDp.dp
         } else {
-            configuration.screenHeightDp.dp
+            configuration.screenHeightDp.dp / 2.5f
         }
 
     val imagePainter = rememberImagePainter(
@@ -57,7 +57,7 @@ fun MemeImgCard(url: String) {
     )
     Card(
         shape = MaterialTheme.shapes.medium,
-        modifier = Modifier.width(maxDimention / 2.5f),
+        modifier = Modifier.width(maxDimention),
         elevation = 3.dp
     ) {
         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
