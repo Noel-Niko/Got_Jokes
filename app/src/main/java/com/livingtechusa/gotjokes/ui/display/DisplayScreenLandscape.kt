@@ -59,13 +59,13 @@ fun DisplayScreenLandscape() {
         val caption by buildViewModel.caption.collectAsState()
         val image by buildViewModel.imageUrl.collectAsState()
         val scrollState = rememberScrollState()
+        val maxHeight = configuration.screenHeightDp
 
         LazyRow(
-//            modifier = Modifier
-//                .width(700.dp)
-//                .padding(16.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
         ) {
-            // TODO: animate the progress icon to be 3 dots moving
             if (image == null) {
                 item {
                     Column(
@@ -79,43 +79,45 @@ fun DisplayScreenLandscape() {
                 }
             } else {
                 item {
-                     Row(
-                        modifier = Modifier
-                        .fillMaxSize()
-                       // .padding(8.dp)
+                    Row(
+                        modifier = Modifier.padding(8.dp)
                     ) {
                         Column(
-//                            modifier = Modifier
-//                                .fillMaxWidth(0.5f)
-//                                .padding(8.dp)
-                                //.verticalScroll(state = scrollState)
+                            modifier = Modifier
+                                .fillMaxSize()
                         ) {
-                          //  Spacer(Modifier.height(16.dp))
+                            //  Spacer(Modifier.height(16.dp))
                             if (image != null) {
                                 MemeImgCard(url = image!!)
                             }
                         }
-//                        Column() {
-//                            Spacer(modifier = Modifier.width(8.dp))
-//                            TextField(
-//                                modifier = Modifier.fillMaxWidth(),
-//                                value = caption,
-//                                onValueChange = {
-//                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(it))
-//                                },
-//                                label = { Text("Caption: What's your best idea?") }
-//                            )
-//                            Spacer(modifier = Modifier.height(16.dp))
-//                            Button(
-//                                onClick = {
-//                                    buildViewModel.onTriggerEvent(BuildEvent.Save)
-//                                },
-//                                modifier = Modifier
-//                                    .fillMaxWidth()
-//                            ) {
-//                                Text(stringResource(R.string.save))
-//                            }
-//                        }
+                        Column(
+                            modifier = Modifier
+                                .verticalScroll(scrollState)
+                                .align(alignment = Alignment.CenterVertically)
+
+                        ) {
+                            TextField(
+                                modifier = Modifier
+                                    .width(maxHeight.dp)
+                                    .wrapContentWidth(),
+                                value = caption,
+                                onValueChange = {
+                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(it))
+                                },
+                                label = { Text("Caption: What's your best idea?") }
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = {
+                                    buildViewModel.onTriggerEvent(BuildEvent.Save)
+                                },
+                                modifier = Modifier
+                                    .align(alignment = Alignment.CenterHorizontally)
+                            ) {
+                                Text(stringResource(R.string.save))
+                            }
+                        }
                     }
                 }
             }

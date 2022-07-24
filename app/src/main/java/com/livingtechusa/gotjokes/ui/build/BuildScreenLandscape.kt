@@ -1,20 +1,25 @@
 package com.livingtechusa.gotjokes.ui.build
 
 import android.content.res.Configuration
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -46,14 +51,13 @@ fun BuildScreenLandscape() {
         val catFact by buildViewModel.catFact.collectAsState()
         val dogFact by buildViewModel.dogFact.collectAsState()
 
-        val configuration = LocalConfiguration.current
+        val scrollState = rememberScrollState()
 
         LazyRow(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(8.dp)
         ) {
-            // TODO: animate the progress icon to be 3 dots moving
             if (image == null && yoMamma.joke == null) {
                 item {
                     Row(
@@ -73,14 +77,23 @@ fun BuildScreenLandscape() {
                     ) {
                         Column(
                             modifier = Modifier
-                                .fillMaxWidth(0.5f)
-                                .fillMaxHeight()
+                                .fillMaxSize()
                         ) {
                             if (image != null) {
                                 MemeImgCard(url = image!!)
                             }
                         }
-                        Column{
+                        Column(
+                            modifier = Modifier.verticalScroll(scrollState)
+                        ){
+                            TextField(
+                                modifier = Modifier.fillMaxWidth(),
+                                value = caption,
+                                onValueChange = {
+                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(it))
+                                },
+                                label = { Text("Caption: What's your best idea?") }
+                            )
                             Spacer(modifier = Modifier.width(8.dp))
                             ClickableText(
                                 modifier = Modifier
