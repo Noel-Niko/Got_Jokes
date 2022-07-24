@@ -3,14 +3,19 @@ package com.livingtechusa.gotjokes.ui.build
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
+import com.livingtechusa.gotjokes.data.api.ApiConstants
+import com.livingtechusa.gotjokes.data.api.ApiConstants.PEXEL_API_KEY
 import com.livingtechusa.gotjokes.data.api.model.Advice
 import com.livingtechusa.gotjokes.data.api.model.CatFact
 import com.livingtechusa.gotjokes.data.api.model.DadJokes
 import com.livingtechusa.gotjokes.data.api.model.DogFact
-import com.livingtechusa.gotjokes.data.api.model.Joke
+import com.livingtechusa.gotjokes.data.api.model.ImgFlip
 import com.livingtechusa.gotjokes.data.api.model.JokeApi
 import com.livingtechusa.gotjokes.data.api.model.RandomFact
 import com.livingtechusa.gotjokes.data.api.model.YoMamma
+import com.livingtechusa.gotjokes.data.database.convertLocalDateTimeToDate
+import com.livingtechusa.gotjokes.data.database.entity.ImageSearchEntity
+import com.livingtechusa.gotjokes.data.database.localService.LocalServiceProvider
 import com.livingtechusa.gotjokes.network.JokeApiService
 import com.livingtechusa.gotjokes.network.GoogleImageApi
 import com.livingtechusa.gotjokes.network.ImgFlipApi
@@ -21,7 +26,12 @@ import com.livingtechusa.gotjokes.network.AdviceApiService
 import com.livingtechusa.gotjokes.network.CatFactApiService
 import com.livingtechusa.gotjokes.network.DadJokeApiService
 import com.livingtechusa.gotjokes.network.DogFactApiService
+import com.livingtechusa.gotjokes.network.PexelApi
 import com.livingtechusa.gotjokes.ui.build.BuildEvent.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalDateTime
+import java.util.Date
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -30,14 +40,17 @@ const val STATE_KEY_URL = "com.livingtechusa.gotjokes.ui.build.joke.url"
 
 enum class ApiStatus { PRE_INIT, LOADING, ERROR, DONE }
 
-class BuildViewModel() : ViewModel() {
+@HiltViewModel
+class BuildViewModel @Inject constructor(
+    private val localService: LocalServiceProvider
+) : ViewModel() {
 
     //    private val _status = MutableStateFlow(ApiStatus.PRE_INIT)
     //    val status: StateFlow<ApiStatus>
     //        get() = _status
 
-    private val _imageList = MutableStateFlow(emptyList<String>())
-    val imageList: StateFlow<List<String>> get() = _imageList
+    private val _imageList = MutableStateFlow(emptyList<ImageSearchEntity>())
+    val imageList: StateFlow<List<ImageSearchEntity>> get() = _imageList
 
     private val _imageUrl = MutableStateFlow(String())
     val imageUrl: StateFlow<String?> get() = _imageUrl
@@ -69,8 +82,8 @@ class BuildViewModel() : ViewModel() {
     private val _dogFact = MutableStateFlow(DogFact())
     val dogFact: StateFlow<DogFact> get() = _dogFact
 
-    private val _joke = MutableStateFlow(Joke())
-    var joke: StateFlow<Joke> = _joke
+    //    private val _joke = MutableStateFlow(Joke())
+    //    var joke: StateFlow<Joke> = _joke
 
     var _loading: Boolean by mutableStateOf(false)
     val loading: Boolean get() = _loading
@@ -153,36 +166,34 @@ class BuildViewModel() : ViewModel() {
      */
     private fun getImages() {
         viewModelScope.launch {
-            val images = mutableListOf<String>()
-            val imgFlipResult = ImgFlipApi.retrofitService.getImgFlipMeme()
-            for (url in imgFlipResult.data.memes) {
-                images.add(url.url)
+            // check database
+            // if not empty remove images > 2 weeks old
+            val dbImages = localService.getAllImages()
+            val twoWeeksAgo: Date = convertLocalDateTimeToDate(LocalDateTime.now().minusWeeks(2L)) ?: Date(System.currentTimeMillis())
+            localService.clearOldImages(twoWeeksAgo)
+
+            if (dbImages.size < 300) {
+                // ImgFLip
+                val imgFlipResult: ImgFlip = ImgFlipApi.retrofitService.getImgFlipMeme()
+                localService.insertImgFlipMemeImageList(imgFlipResult.data.memes)
+
+                // Google Results
+                val googleImageResult = GoogleImageApi.retrofitService.getGoogleImages()
+                if (googleImageResult != null) {
+                    localService.insertGoogleImages(googleImageResult)
+                }
+                // Pexel Results
+                var pexelImages = PexelApi.retrofitService.getPexelMeme(PEXEL_API_KEY, "1")
+                if (pexelImages != null) {
+                    localService.insertPexelImageList(pexelImages)
+                }
+                pexelImages = PexelApi.retrofitService.getPexelMeme(PEXEL_API_KEY, "2")
+                if (pexelImages != null) {
+                    localService.insertPexelImageList(pexelImages)
+                }
             }
-//            val googleImageResult = GoogleImageApi.retrofitService.getGoogleImages()
-//            if (googleImageResult != null) {
-//                for (item in googleImageResult.items) {
-//                    if (item.pagemap.imageobject?.listIterator() != null) {
-//                        for (tag in item.pagemap.imageobject.listIterator()) {
-//                            if (!tag.url.contains("logo")) {
-//                                images.add(tag.url)
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            val googleImageResult2 = GoogleImageApi.retrofitService.getNextPageGoogleImages()
-//            if (googleImageResult2 != null) {
-//                for (item in googleImageResult2.items) {
-//                    if (item.pagemap.imageobject?.listIterator() != null) {
-//                        for (tag in item.pagemap.imageobject.listIterator()) {
-//                            if (!tag.url.contains("logo")) {
-//                                images.add(tag.url)
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-            _imageList.value += images
+            // update ImageList
+            _imageList.value = localService.getAllImages()
             getImage()
             _loading = false
         }
@@ -191,8 +202,8 @@ class BuildViewModel() : ViewModel() {
     private fun getImage() {
         if (_imageList.value.size > 0) {
             val rand = (0.._imageList.value.size - 1).shuffled().first()
-            val imageUrl = imageList.value[rand]
-            _imageUrl.value = imageUrl
+            val imageSearchEntity = imageList.value[rand]
+            _imageUrl.value = imageSearchEntity.imageUrl
         } else {
             getImageList()
         }
@@ -202,8 +213,8 @@ class BuildViewModel() : ViewModel() {
         _loading = true
         getImages()
         val rand = (0.._imageList.value.size - 1).shuffled().first()
-        val imageURL = imageList.value.get(rand)
-        _imageUrl.value = imageURL
+        val imageSearchEntity = imageList.value.get(rand)
+        _imageUrl.value = imageSearchEntity.imageUrl
         _loading = false
     }
 
