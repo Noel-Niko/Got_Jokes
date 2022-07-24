@@ -6,7 +6,7 @@ object ApiConstants {
     const val BASE_URL_GOOGLE_IMAGE = "https://www.googleapis.com/customsearch/"
     const val END_POINT_GOOGLE_IMAGE1 = "v1?key=AIzaSyAw4gfjQSBxieq3NGg8iydmlcjkdrOC_74&searchtype=image&cx=07f5aa9fbf617a226&q=funny%20image"
     const val END_POINT_GOOGLE_IMAGE2 =
-        "v1?key=AIzaSyAw4gfjQSBxieq3NGg8iydmlcjkdrOC_74&searchtype=image&cx=07f5aa9fbf617a226&q=funny%20image&hl=en&tbs&sa=X&ved=0CAEQpwVqFwoTCMiwiZHN-fgCFQAAAAAdAAAAABAF"
+        "v1?key=AIzaSyAw4gfjQSBxieq3NGg8iydmlcjkdrOC_74&searchtype=image&cx=07f5aa9fbf617a226&q=funny%20images%20of%20people&hl=en&tbs&sa=X&ved=0CAEQpwVqFwoTCMiwiZHN-fgCFQAAAAAdAAAAABAF"
     const val BASE_URL_YOMAMMA = "https://yomomma-api.herokuapp.com/"
     const val END_POINT_YOMAMMA = "jokes"
     const val BASE_URL_YODA = "https://api.funtranslations.com/"

@@ -48,6 +48,10 @@ class LocalServiceProvider @Inject constructor(
         return imageDao.getOneFromImageSearchTable()
     }
 
+    override suspend fun removeOneImage(url: String) {
+        return imageDao.removeImage(url)
+    }
+
     override suspend fun getAllImages(): List<ImageSearchEntity> {
         return imageDao.getAllFromImageSearchTable()
     }

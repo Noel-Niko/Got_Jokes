@@ -92,11 +92,10 @@ fun DisplayScreen() {
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
                             onClick = {
                                 buildViewModel.onTriggerEvent(BuildEvent.Save)
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
+                            }
                         ) {
                             Text(stringResource(R.string.save))
                         }

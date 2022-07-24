@@ -34,6 +34,7 @@ import java.util.Date
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 const val STATE_KEY_URL = "com.livingtechusa.gotjokes.ui.build.joke.url"
@@ -182,6 +183,10 @@ class BuildViewModel @Inject constructor(
                 if (googleImageResult != null) {
                     localService.insertGoogleImages(googleImageResult)
                 }
+                val googleImageResult2 = GoogleImageApi.retrofitService.getNextPageGoogleImages()
+                if (googleImageResult2 != null) {
+                    localService.insertGoogleImages(googleImageResult2)
+                }
                 // Pexel Results
                 var pexelImages = PexelApi.retrofitService.getPexelMeme(PEXEL_API_KEY, "1")
                 if (pexelImages != null) {
@@ -199,8 +204,10 @@ class BuildViewModel @Inject constructor(
         }
     }
 
-    private fun getImage() {
-        if (_imageList.value.size > 0) {
+    private suspend fun getImage() {
+        if (_imageList.value.size > 10) {
+            localService.removeOneImage((_imageUrl.value))
+            _imageList.value = localService.getAllImages()
             val rand = (0.._imageList.value.size - 1).shuffled().first()
             val imageSearchEntity = imageList.value[rand]
             _imageUrl.value = imageSearchEntity.imageUrl

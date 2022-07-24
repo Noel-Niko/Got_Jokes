@@ -19,4 +19,5 @@ interface ILocalService {
     suspend fun getAllJokes():List<Joke>
     suspend fun clearJokesTable()
     suspend fun insertPexelImageList(pexel: Pexel)
+    suspend fun removeOneImage(url: String)
 }

@@ -1,6 +1,7 @@
 package com.livingtechusa.gotjokes.ui.components
 
 import android.content.res.Configuration
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
@@ -44,7 +46,7 @@ fun MemeImgCard(url: String) {
     val scrollState = rememberScrollState()
     val maxDimention: Dp =
         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            configuration.screenWidthDp.dp
+            configuration.screenHeightDp.dp
         } else {
             configuration.screenHeightDp.dp / 2.5f
         }
@@ -55,54 +57,38 @@ fun MemeImgCard(url: String) {
             allowHardware(false)
         }
     )
-    Card(
-        shape = MaterialTheme.shapes.medium,
-        modifier = Modifier.width(maxDimention),
-        elevation = 3.dp
-    ) {
-        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Column(
-              modifier = Modifier
-                  .fillMaxSize()
-                  .verticalScroll(scrollState,true)
-            ) {
-                Image(
-                    painter = imagePainter,
-                    contentDescription = "Random Image",
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .align(Alignment.CenterHorizontally),
-                   contentScale = ContentScale.Fit
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                TextField(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .wrapContentWidth(),
-                    value = caption,
-                    onValueChange = {
-                        buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(it))
-                    },
-                    label = { Text("Caption: What's your best idea?") }
-                )
-            }
-        } else {
-            Column(
+    if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        Card(
+            shape = MaterialTheme.shapes.medium,
+            modifier = Modifier
+                .width(maxDimention)
+                .fillMaxHeight()
+                .padding(4.dp),
+            elevation = 0.dp
+        ) {
+            Image(
+                painter = imagePainter,
+                contentDescription = "Random Image",
                 modifier = Modifier
-                    .height(maxDimention / 3)
-                    .fillMaxWidth()
-            ) {
-                Image(
-                    painter = imagePainter,
-                    contentDescription = "Random Image",
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .fillMaxSize(),
-                    contentScale = ContentScale.Fit
-                )
-            }
+                    .fillMaxSize(),
+                contentScale = ContentScale.Fit
+            )
+        }
+    } else {
+        Card(
+            shape = MaterialTheme.shapes.medium,
+            modifier = Modifier
+                .height(maxDimention)
+                .fillMaxWidth(),
+            elevation = 0.dp
+        ) {
+            Image(
+                painter = imagePainter,
+                contentDescription = "Random Image",
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentScale = ContentScale.Fit
+            )
         }
     }
 }
