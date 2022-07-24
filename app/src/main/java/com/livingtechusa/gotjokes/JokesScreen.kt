@@ -2,9 +2,20 @@ package com.livingtechusa.gotjokes
 
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.AddCircleOutline
+import androidx.compose.material.icons.filled.ArrowCircleUp
 import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoneyOff
+import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.PictureInPicture
+import androidx.compose.material.icons.filled.PictureInPictureAlt
 import androidx.compose.material.icons.filled.PieChart
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.ShuffleOn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.livingtechusa.gotjokes.ui.build.BuildScreen
@@ -17,15 +28,15 @@ enum class JokesScreen(
     val body: @Composable ((String) -> Unit) -> Unit
 ) {
     Build(
-        icon = Icons.Filled.PieChart,
+        icon = Icons.Filled.Build  ,
         body = {  BuildScreen() }
     ),
     Display(
-        icon = Icons.Filled.AttachMoney,
+        icon = Icons.Filled.AddAPhoto     ,
         body = { com.livingtechusa.gotjokes.ui.display.DisplayScreen() }
     ),
-    Save(
-        icon = Icons.Filled.MoneyOff,
+    Saved(
+        icon = Icons.Filled.Save,
         body = { com.livingtechusa.gotjokes.ui.saved.SavedScreen() }
     );
 
@@ -39,7 +50,7 @@ enum class JokesScreen(
             when (route?.substringBefore("/")) {
                 Build.name -> Build
                 Display.name -> Display
-                Save.name -> Save
+                Saved.name -> Saved
                 null -> Build
                 else -> throw IllegalArgumentException("Route $route is not recognized.")
             }

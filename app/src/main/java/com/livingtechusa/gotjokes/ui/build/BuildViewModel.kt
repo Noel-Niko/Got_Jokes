@@ -1,33 +1,38 @@
 package com.livingtechusa.gotjokes.ui.build
 
-import android.os.Bundle
 import android.util.Log
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.*
-import androidx.navigation.compose.rememberNavController
-import com.livingtechusa.gotjokes.Display
-import com.livingtechusa.gotjokes.Saved
+import com.livingtechusa.gotjokes.data.api.ApiConstants.PEXEL_API_KEY
 import com.livingtechusa.gotjokes.data.api.model.Advice
 import com.livingtechusa.gotjokes.data.api.model.CatFact
-import com.livingtechusa.gotjokes.data.api.model.ChuckNorris
 import com.livingtechusa.gotjokes.data.api.model.DadJokes
 import com.livingtechusa.gotjokes.data.api.model.DogFact
-import com.livingtechusa.gotjokes.data.api.model.Joke
+import com.livingtechusa.gotjokes.data.api.model.ImgFlip
 import com.livingtechusa.gotjokes.data.api.model.JokeApi
 import com.livingtechusa.gotjokes.data.api.model.RandomFact
 import com.livingtechusa.gotjokes.data.api.model.YoMamma
-import com.livingtechusa.gotjokes.navigateSingleTopTo
-import com.livingtechusa.gotjokes.network.JokeApiService
-import com.livingtechusa.gotjokes.network.GoogleImageApi
-import com.livingtechusa.gotjokes.network.ImgFlipApi
-import com.livingtechusa.gotjokes.network.RandomFactsApiService
-import com.livingtechusa.gotjokes.network.YoMammaApi
-import com.livingtechusa.gotjokes.network.YodaApiService
+import com.livingtechusa.gotjokes.data.database.convertLocalDateTimeToDate
+import com.livingtechusa.gotjokes.data.database.entity.ImageSearchEntity
+import com.livingtechusa.gotjokes.data.database.entity.JokeEntity
+import com.livingtechusa.gotjokes.data.database.localService.LocalServiceProvider
 import com.livingtechusa.gotjokes.network.AdviceApiService
 import com.livingtechusa.gotjokes.network.CatFactApiService
 import com.livingtechusa.gotjokes.network.DadJokeApiService
 import com.livingtechusa.gotjokes.network.DogFactApiService
+import com.livingtechusa.gotjokes.network.GoogleImageApi
+import com.livingtechusa.gotjokes.network.ImgFlipApi
+import com.livingtechusa.gotjokes.network.JokeApiService
+import com.livingtechusa.gotjokes.network.PexelApi
+import com.livingtechusa.gotjokes.network.RandomFactsApiService
+import com.livingtechusa.gotjokes.network.YoMammaApi
+import com.livingtechusa.gotjokes.network.YodaApiService
 import com.livingtechusa.gotjokes.ui.build.BuildEvent.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.LocalDateTime
+import java.util.Date
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -36,14 +41,17 @@ const val STATE_KEY_URL = "com.livingtechusa.gotjokes.ui.build.joke.url"
 
 enum class ApiStatus { PRE_INIT, LOADING, ERROR, DONE }
 
-class BuildViewModel() : ViewModel() {
+@HiltViewModel
+class BuildViewModel @Inject constructor(
+    private val localService: LocalServiceProvider
+) : ViewModel() {
 
     //    private val _status = MutableStateFlow(ApiStatus.PRE_INIT)
     //    val status: StateFlow<ApiStatus>
     //        get() = _status
 
-    private val _imageList = MutableStateFlow(emptyList<String>())
-    val imageList: StateFlow<List<String>> get() = _imageList
+    private val _imageList = MutableStateFlow(emptyList<ImageSearchEntity>())
+    val imageList: StateFlow<List<ImageSearchEntity>> get() = _imageList
 
     private val _imageUrl = MutableStateFlow(String())
     val imageUrl: StateFlow<String?> get() = _imageUrl
@@ -75,12 +83,13 @@ class BuildViewModel() : ViewModel() {
     private val _dogFact = MutableStateFlow(DogFact())
     val dogFact: StateFlow<DogFact> get() = _dogFact
 
-    private val _joke = MutableStateFlow(Joke())
-    var joke: StateFlow<Joke> = _joke
+    val jokes: LiveData<List<JokeEntity>> = localService.getAllJokes().asLiveData()
+
+    val _color: MutableStateFlow<Color> = MutableStateFlow(Color.Black)
+    val color: StateFlow<Color> get() = _color
 
     var _loading: Boolean by mutableStateOf(false)
     val loading: Boolean get() = _loading
-
 
 
     init {
@@ -97,9 +106,9 @@ class BuildViewModel() : ViewModel() {
         //        if (state.get<String>(STATE_KEY_URL) == "com.livingtechusa.gotjokes.ui.build.joke.url") {
         //            state.get<String>(STATE_KEY_URL)?.let { imgFlipUrl ->
         //                joke.image = imgFlipUrl
-        //            } ?: onTriggerEvent(GetImgFlipImages)
+        //            } ?: onTriggerEvent(GetImages)
         //        } else {
-        //            onTriggerEvent(GetImgFlipImages)
+        //            onTriggerEvent(GetImages)
         //        }
 
     }
@@ -109,7 +118,7 @@ class BuildViewModel() : ViewModel() {
         viewModelScope.launch {
             try {
                 when (event) {
-                    is GetImgFlipImages -> {
+                    is GetImages -> {
                         _caption.value = ""
                         getImageList()
                         getYoMammaJokes()
@@ -120,7 +129,7 @@ class BuildViewModel() : ViewModel() {
                         getCatFact()
                         getDogFact()
                     }
-                    is GetNewImgFlipImage -> {
+                    is GetNewImage -> {
                         _caption.value = ""
                         getImage()
                         getYoMammaJokes()
@@ -136,6 +145,29 @@ class BuildViewModel() : ViewModel() {
                     }
                     is UpdateCaption -> {
                         _caption.value = event.text
+                    }
+                    is Save -> {
+                        val joke = JokeEntity(
+                            imageUrl = imageUrl.value.toString(),
+                            caption = caption.value,
+                            dateAdded = Date(System.currentTimeMillis())
+                        )
+                        localService.insertJoke(joke)
+                    }
+                    is Delete -> {
+                        viewModelScope.launch {
+                            localService.deleteJoke(joke = event.joke)
+                        }
+                    }
+                    is UpdateColor -> {
+                        when (_color.value) {
+                            Color.Black -> _color.value = Color.Gray
+                            Color.Gray -> _color.value = Color.White
+                            Color.White -> _color.value = Color.Yellow
+                            Color.Yellow -> _color.value = Color.Blue
+                            Color.Blue -> _color.value = Color.Black
+                            else -> _color.value = Color.Black
+                        }
                     }
                 }
 
@@ -154,42 +186,50 @@ class BuildViewModel() : ViewModel() {
      */
     private fun getImages() {
         viewModelScope.launch {
-            val images = mutableListOf<String>()
-            val imgFlipResult = ImgFlipApi.retrofitService.getImgFlipMeme()
-            for(url in imgFlipResult.data.memes){
-                images.add(url.url)
-            }
-            val googleImageResult = GoogleImageApi.retrofitService.getGoogleImages()
-            for (item in googleImageResult.items    ){
-                if(item.pagemap.imageobject?.listIterator() != null) {
-                    for (tag in item.pagemap.imageobject.listIterator()) {
-                        if(!tag.url.contains("logo")) {
-                            images.add(tag.url)
-                        }
-                    }
+            // check database
+            // if not empty remove images > 2 weeks old
+            val dbImages = localService.getAllImages()
+            val twoWeeksAgo: Date = convertLocalDateTimeToDate(LocalDateTime.now().minusWeeks(2L)) ?: Date(System.currentTimeMillis())
+            localService.clearOldImages(twoWeeksAgo)
+
+            if (dbImages.size < 200) {
+                // ImgFLip
+                val imgFlipResult: ImgFlip = ImgFlipApi.retrofitService.getImgFlipMeme()
+                localService.insertImgFlipMemeImageList(imgFlipResult.data.memes)
+
+                // Google Results
+                val googleImageResult = GoogleImageApi.retrofitService.getGoogleImages()
+                if (googleImageResult != null) {
+                    localService.insertGoogleImages(googleImageResult)
+                }
+                val googleImageResult2 = GoogleImageApi.retrofitService.getNextPageGoogleImages()
+                if (googleImageResult2 != null) {
+                    localService.insertGoogleImages(googleImageResult2)
+                }
+                // Pexel Results
+                var pexelImages = PexelApi.retrofitService.getPexelMeme(PEXEL_API_KEY, "1")
+                if (pexelImages != null) {
+                    localService.insertPexelImageList(pexelImages)
+                }
+                pexelImages = PexelApi.retrofitService.getPexelMeme(PEXEL_API_KEY, "2")
+                if (pexelImages != null) {
+                    localService.insertPexelImageList(pexelImages)
                 }
             }
-            val googleImageResult2 = GoogleImageApi.retrofitService.getNextPageGoogleImages()
-            for (item in googleImageResult2.items    ){
-                if(item.pagemap.imageobject?.listIterator() != null) {
-                    for (tag in item.pagemap.imageobject.listIterator()) {
-                        if(!tag.url.contains("logo")) {
-                            images.add(tag.url)
-                        }
-                    }
-                }
-            }
-            _imageList.value = images
+            // update ImageList
+            _imageList.value = localService.getAllImages()
             getImage()
             _loading = false
         }
     }
 
-    private fun getImage() {
-        if (_imageList.value.size > 0) {
+    private suspend fun getImage() {
+        if (_imageList.value.size > 10) {
+            localService.removeOneImage((_imageUrl.value))
+            _imageList.value = localService.getAllImages()
             val rand = (0.._imageList.value.size - 1).shuffled().first()
-            val imageUrl = imageList.value[rand]
-            _imageUrl.value = imageUrl
+            val imageSearchEntity = imageList.value[rand]
+            _imageUrl.value = imageSearchEntity.imageUrl
         } else {
             getImageList()
         }
@@ -199,8 +239,8 @@ class BuildViewModel() : ViewModel() {
         _loading = true
         getImages()
         val rand = (0.._imageList.value.size - 1).shuffled().first()
-        val imageURL = imageList.value.get(rand)
-        _imageUrl.value = imageURL
+        val imageSearchEntity = imageList.value.get(rand)
+        _imageUrl.value = imageSearchEntity.imageUrl
         _loading = false
     }
 
@@ -213,8 +253,8 @@ class BuildViewModel() : ViewModel() {
             try {
                 val result = YoMammaApi.retrofitService.getYoMammaJoke()
                 _yoMamma.value = result
-            } catch(e: Exception){
-                Log.i("YoMamma", e.message + " with cause " +e.cause)
+            } catch (e: Exception) {
+                Log.i("YoMamma", e.message + " with cause " + e.cause)
             }
             _loading = false
         }
@@ -238,7 +278,7 @@ class BuildViewModel() : ViewModel() {
             try {
                 val result = RandomFactsApiService.RandomFactsApi.retrofitService.getRandomFacts()
                 if (result != null) {
-                _randomFact.value = result
+                    _randomFact.value = result
                 }
             } catch (e: Exception) {
                 Log.i("RandomFact", e.message + " with cause " + e.cause)
@@ -292,6 +332,7 @@ class BuildViewModel() : ViewModel() {
             _loading = false
         }
     }
+
     private fun getCatFact() {
         viewModelScope.launch {
             try {

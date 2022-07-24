@@ -1,5 +1,6 @@
 package com.livingtechusa.gotjokes.ui.build
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,183 +39,157 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import coil.compose.rememberImagePainter
-import com.livingtechusa.gotjokes.ui.theme.JokesTheme
+import com.livingtechusa.gotjokes.ui.components.MemeImgCard
 
 
 @Composable
 fun BuildScreen() {
-    val buildViewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
-    val caption by buildViewModel.caption.collectAsState()
-    val image by buildViewModel.imageUrl.collectAsState()
-    val yoMamma by buildViewModel.yoMamma.collectAsState()
-    val randomFact by buildViewModel.randomFact.collectAsState()
-    val dadJoke by buildViewModel.dadJoke.collectAsState()
-    val advice by buildViewModel.advice.collectAsState()
-    val jokeApiJoke by buildViewModel.jokeApiJoke.collectAsState()
-    val catFact by buildViewModel.catFact.collectAsState()
-    val dogFact by buildViewModel.dogFact.collectAsState()
-
-    val scaffoldState = rememberScaffoldState()
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-
-    ) {
-        // TODO: animate the progress icon to be 3 dots moving
-        if (image == null && yoMamma.joke == null) {
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(25.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-        } else {
-            item {
-                //TODO: USE LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp)
-                ) {
-                    Spacer(Modifier.height(16.dp))
-                    if (image != null) {
-                        MemeImgCard(url = image!!)
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    TextField(
-                        modifier = Modifier.fillMaxWidth(),
-                        value = caption,
-                        onValueChange = {
-                            buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(it))
-                        },
-                        label = { Text("Caption: What's your best idea?") }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ClickableText(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = AnnotatedString("Convert Caption to Yoda Speak"),
-                        onClick = {
-                            buildViewModel.onTriggerEvent(BuildEvent.ConvertToYodaSpeak(caption))
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Bad jokes...",
-                        fontWeight = FontWeight.Bold
-                    )
-                    // YoMamma Joke
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ClickableText(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = AnnotatedString(yoMamma.joke ?: "YoMamma is unavaliable now."),
-                        onClick = {
-                            buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(yoMamma.joke.toString()))
-                        }
-                    )
-                    // Dad Joke
-                    Spacer(modifier = Modifier.height(16.dp))
-                    val dadjoke = if (!dadJoke.attachments.isEmpty()) dadJoke.attachments.get(0).text else null
-                    ClickableText(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = AnnotatedString(dadjoke ?: "Don't tell your momma, but Dad's off line now.."),
-                        onClick = {
-                            buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(dadJoke.attachments.get(0).text))
-                        }
-                    )
-                    // Joke
-                    Spacer(modifier = Modifier.height(16.dp))
-                    val jokeApiJokeValue = if (jokeApiJoke.joke.isEmpty().not()) jokeApiJoke.joke else null
-                    ClickableText(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = AnnotatedString(jokeApiJokeValue ?: "Nuttin here ta laugh about!'"),
-                        onClick = {
-                            buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(jokeApiJokeValue.toString()))
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Good advice...",
-                        fontWeight = FontWeight.Bold
-                    )
-                    // Advice
-                    Spacer(modifier = Modifier.height(16.dp))
-                    val adviceString: String? = if (advice.slip.advice.isEmpty().not()) advice.slip.advice else null
-                    ClickableText(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = AnnotatedString(adviceString ?: "No advice is sometimes the best."),
-                        onClick = {
-                            buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(adviceString ?: "No advice is sometimes the best."))
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Did you know...?",
-                        fontWeight = FontWeight.Bold
-                    )
-                    // Random fact
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ClickableText(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = AnnotatedString(randomFact.text ?: "Nuttin ta see here."),
-                        onClick = {
-                            buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(randomFact.text))
-                        }
-                    )
-                    // Cat Fact
-                    Spacer(modifier = Modifier.height(16.dp))
-                    val cats = if (catFact.fact.isEmpty().not()) catFact.fact else null
-                    ClickableText(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = AnnotatedString(cats ?: "All out of cat facts."),
-                        onClick = {
-                            buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(catFact.fact))
-                        }
-                    )
-                    // Dog Fact
-                    Spacer(modifier = Modifier.height(16.dp))
-                    val dogs = if (dogFact.facts.isEmpty().not()) dogFact.facts[0] else null
-                    ClickableText(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = AnnotatedString(dogs ?: "All out of dog gone info."),
-                        onClick = {
-                            buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(dogFact.facts[0]))
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-
-
-@Composable
-fun MemeImgCard(url: String) {
     val configuration = LocalConfiguration.current
+    if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        BuildScreenLandscape()
+    } else {
+        val buildViewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
+        val caption by buildViewModel.caption.collectAsState()
+        val image by buildViewModel.imageUrl.collectAsState()
+        val yoMamma by buildViewModel.yoMamma.collectAsState()
+        val randomFact by buildViewModel.randomFact.collectAsState()
+        val dadJoke by buildViewModel.dadJoke.collectAsState()
+        val advice by buildViewModel.advice.collectAsState()
+        val jokeApiJoke by buildViewModel.jokeApiJoke.collectAsState()
+        val catFact by buildViewModel.catFact.collectAsState()
+        val dogFact by buildViewModel.dogFact.collectAsState()
 
-    val screenHeight = configuration.screenHeightDp.dp
+        val scaffoldState = rememberScaffoldState()
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
 
-    val imagePainter = rememberImagePainter(
-        data = url,
-        builder = {
-            allowHardware(false)
-        }
-    )
-    Card(shape = MaterialTheme.shapes.medium, modifier = Modifier.padding(16.dp)) {
-        Box {
-            Image(
-                painter = imagePainter,
-                contentDescription = "Random Image",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(screenHeight / 3),
-                contentScale = ContentScale.Fit
-            )
+        ) {
+            // TODO: animate the progress icon to be 3 dots moving
+            if (image == null && yoMamma.joke == null) {
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(25.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            } else {
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp)
+                    ) {
+                        Spacer(Modifier.height(16.dp))
+                        if (image != null) {
+                            MemeImgCard(url = image!!)
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        TextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = caption,
+                            onValueChange = {
+                                buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(it))
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        ClickableText(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = AnnotatedString("Convert Caption to Yoda Speak"),
+                            onClick = {
+                                buildViewModel.onTriggerEvent(BuildEvent.ConvertToYodaSpeak(caption))
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Bad jokes...",
+                            fontWeight = FontWeight.Bold
+                        )
+                        // YoMamma Joke
+                        Spacer(modifier = Modifier.height(16.dp))
+                        ClickableText(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = AnnotatedString(yoMamma.joke ?: "YoMamma is unavaliable now."),
+                            onClick = {
+                                buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(yoMamma.joke.toString()))
+                            }
+                        )
+                        // Dad Joke
+                        Spacer(modifier = Modifier.height(16.dp))
+                        val dadjoke = if (!dadJoke.attachments.isEmpty()) dadJoke.attachments.get(0).text else null
+                        ClickableText(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = AnnotatedString(dadjoke ?: "Don't tell your momma, but Dad's off line now.."),
+                            onClick = {
+                                buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(dadJoke.attachments.get(0).text))
+                            }
+                        )
+                        // Joke
+                        Spacer(modifier = Modifier.height(16.dp))
+                        val jokeApiJokeValue = if (jokeApiJoke.joke.isEmpty().not()) jokeApiJoke.joke else null
+                        ClickableText(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = AnnotatedString(jokeApiJokeValue ?: "Nuttin here ta laugh about!'"),
+                            onClick = {
+                                buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(jokeApiJokeValue.toString()))
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Good advice...",
+                            fontWeight = FontWeight.Bold
+                        )
+                        // Advice
+                        Spacer(modifier = Modifier.height(16.dp))
+                        val adviceString: String? = if (advice.slip.advice.isEmpty().not()) advice.slip.advice else null
+                        ClickableText(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = AnnotatedString(adviceString ?: "No advice is sometimes the best."),
+                            onClick = {
+                                buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(adviceString ?: "No advice is sometimes the best."))
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Did you know...?",
+                            fontWeight = FontWeight.Bold
+                        )
+                        // Random fact
+                        Spacer(modifier = Modifier.height(16.dp))
+                        ClickableText(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = AnnotatedString(randomFact.text ?: "Nuttin ta see here."),
+                            onClick = {
+                                buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(randomFact.text))
+                            }
+                        )
+                        // Cat Fact
+                        Spacer(modifier = Modifier.height(16.dp))
+                        val cats = if (catFact.fact.isEmpty().not()) catFact.fact else null
+                        ClickableText(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = AnnotatedString(cats ?: "All out of cat facts."),
+                            onClick = {
+                                buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(catFact.fact))
+                            }
+                        )
+                        // Dog Fact
+                        Spacer(modifier = Modifier.height(16.dp))
+                        val dogs = if (dogFact.facts.isEmpty().not()) dogFact.facts[0] else null
+                        ClickableText(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = AnnotatedString(dogs ?: "All out of dog gone info."),
+                            onClick = {
+                                buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(dogFact.facts[0]))
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
 }

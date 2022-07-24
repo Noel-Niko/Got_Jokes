@@ -24,10 +24,10 @@ private val googleImageRetrofit = Retrofit.Builder()
  */
 interface GoogleImagesApiService { // id=07f5aa9fbf617a226 key=AIzaSyAw4gfjQSBxieq3NGg8iydmlcjkdrOC_74
     @GET(END_POINT_GOOGLE_IMAGE1)
-    suspend fun getGoogleImages(): GoogleImages
+    suspend fun getGoogleImages(): GoogleImages?
 
     @GET(END_POINT_GOOGLE_IMAGE2)
-    suspend fun getNextPageGoogleImages(): GoogleImages
+    suspend fun getNextPageGoogleImages(): GoogleImages?
 }
 
 /**
