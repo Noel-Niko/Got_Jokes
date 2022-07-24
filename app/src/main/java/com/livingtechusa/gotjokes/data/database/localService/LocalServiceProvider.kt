@@ -7,11 +7,12 @@ import com.livingtechusa.gotjokes.data.api.model.Pexel
 import com.livingtechusa.gotjokes.data.database.dao.ImageSearchDao
 import com.livingtechusa.gotjokes.data.database.dao.JokeDao
 import com.livingtechusa.gotjokes.data.database.entity.ImageSearchEntity
-import com.livingtechusa.gotjokes.util.toEntity
+import com.livingtechusa.gotjokes.data.database.entity.JokeEntity
 import com.livingtechusa.gotjokes.util.toImageSearchEntity
-import com.livingtechusa.gotjokes.util.toModel
 import java.util.Date
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class LocalServiceProvider @Inject constructor(
     private val jokeDao: JokeDao,
@@ -60,20 +61,16 @@ class LocalServiceProvider @Inject constructor(
         imageDao.clearImageSearchTable(date)
     }
 
-    override suspend fun insertJoke(joke: Joke) {
-        jokeDao.insertJoke(joke.toEntity())
+    override suspend fun insertJoke(joke: JokeEntity) {
+        jokeDao.insertJoke(joke)
     }
 
-    override suspend fun deleteJoke(joke: Joke) {
-        jokeDao.removeJoke(joke.id)
+    override suspend fun deleteJoke(joke: JokeEntity) {
+        jokeDao.removeJoke(joke.imageUrl, joke.caption)
     }
 
-    override suspend fun getAllJokes(): List<Joke> {
-        val list = mutableListOf<Joke>()
-        for (joke in jokeDao.getAllFromJokeTable()) {
-            list.add(joke.toModel())
-        }
-        return list
+    override fun getAllJokes(): Flow<List<JokeEntity>>  {
+        return jokeDao.getAllFromJokeTable()
     }
 
     override suspend fun clearJokesTable() {

@@ -2,8 +2,8 @@ package com.livingtechusa.gotjokes.ui.build
 
 import android.util.Log
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.*
-import com.livingtechusa.gotjokes.data.api.ApiConstants
 import com.livingtechusa.gotjokes.data.api.ApiConstants.PEXEL_API_KEY
 import com.livingtechusa.gotjokes.data.api.model.Advice
 import com.livingtechusa.gotjokes.data.api.model.CatFact
@@ -15,18 +15,19 @@ import com.livingtechusa.gotjokes.data.api.model.RandomFact
 import com.livingtechusa.gotjokes.data.api.model.YoMamma
 import com.livingtechusa.gotjokes.data.database.convertLocalDateTimeToDate
 import com.livingtechusa.gotjokes.data.database.entity.ImageSearchEntity
+import com.livingtechusa.gotjokes.data.database.entity.JokeEntity
 import com.livingtechusa.gotjokes.data.database.localService.LocalServiceProvider
-import com.livingtechusa.gotjokes.network.JokeApiService
-import com.livingtechusa.gotjokes.network.GoogleImageApi
-import com.livingtechusa.gotjokes.network.ImgFlipApi
-import com.livingtechusa.gotjokes.network.RandomFactsApiService
-import com.livingtechusa.gotjokes.network.YoMammaApi
-import com.livingtechusa.gotjokes.network.YodaApiService
 import com.livingtechusa.gotjokes.network.AdviceApiService
 import com.livingtechusa.gotjokes.network.CatFactApiService
 import com.livingtechusa.gotjokes.network.DadJokeApiService
 import com.livingtechusa.gotjokes.network.DogFactApiService
+import com.livingtechusa.gotjokes.network.GoogleImageApi
+import com.livingtechusa.gotjokes.network.ImgFlipApi
+import com.livingtechusa.gotjokes.network.JokeApiService
 import com.livingtechusa.gotjokes.network.PexelApi
+import com.livingtechusa.gotjokes.network.RandomFactsApiService
+import com.livingtechusa.gotjokes.network.YoMammaApi
+import com.livingtechusa.gotjokes.network.YodaApiService
 import com.livingtechusa.gotjokes.ui.build.BuildEvent.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDateTime
@@ -34,7 +35,6 @@ import java.util.Date
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 const val STATE_KEY_URL = "com.livingtechusa.gotjokes.ui.build.joke.url"
@@ -83,8 +83,10 @@ class BuildViewModel @Inject constructor(
     private val _dogFact = MutableStateFlow(DogFact())
     val dogFact: StateFlow<DogFact> get() = _dogFact
 
-    //    private val _joke = MutableStateFlow(Joke())
-    //    var joke: StateFlow<Joke> = _joke
+    val jokes: LiveData<List<JokeEntity>> = localService.getAllJokes().asLiveData()
+
+    val _color: MutableStateFlow<Color> = MutableStateFlow(Color.Black)
+    val color: StateFlow<Color> get() = _color
 
     var _loading: Boolean by mutableStateOf(false)
     val loading: Boolean get() = _loading
@@ -145,10 +147,27 @@ class BuildViewModel @Inject constructor(
                         _caption.value = event.text
                     }
                     is Save -> {
-
+                        val joke = JokeEntity(
+                            imageUrl = imageUrl.value.toString(),
+                            caption = caption.value,
+                            dateAdded = Date(System.currentTimeMillis())
+                        )
+                        localService.insertJoke(joke)
                     }
                     is Delete -> {
-
+                        viewModelScope.launch {
+                            localService.deleteJoke(joke = event.joke)
+                        }
+                    }
+                    is UpdateColor -> {
+                        when (_color.value) {
+                            Color.Black -> _color.value = Color.Gray
+                            Color.Gray -> _color.value = Color.White
+                            Color.White -> _color.value = Color.Yellow
+                            Color.Yellow -> _color.value = Color.Blue
+                            Color.Blue -> _color.value = Color.Black
+                            else -> _color.value = Color.Black
+                        }
                     }
                 }
 
@@ -173,7 +192,7 @@ class BuildViewModel @Inject constructor(
             val twoWeeksAgo: Date = convertLocalDateTimeToDate(LocalDateTime.now().minusWeeks(2L)) ?: Date(System.currentTimeMillis())
             localService.clearOldImages(twoWeeksAgo)
 
-            if (dbImages.size < 300) {
+            if (dbImages.size < 200) {
                 // ImgFLip
                 val imgFlipResult: ImgFlip = ImgFlipApi.retrofitService.getImgFlipMeme()
                 localService.insertImgFlipMemeImageList(imgFlipResult.data.memes)

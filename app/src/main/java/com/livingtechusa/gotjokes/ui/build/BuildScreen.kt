@@ -94,8 +94,7 @@ fun BuildScreen() {
                             value = caption,
                             onValueChange = {
                                 buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(it))
-                            },
-                            label = { Text("Caption: What's your best idea?") }
+                            }
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         ClickableText(

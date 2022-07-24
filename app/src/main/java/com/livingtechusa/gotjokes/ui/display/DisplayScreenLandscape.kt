@@ -97,15 +97,11 @@ fun DisplayScreenLandscape() {
                                 .align(alignment = Alignment.CenterVertically)
 
                         ) {
-                            TextField(
+                            Text(
                                 modifier = Modifier
                                     .width(maxHeight.dp)
                                     .wrapContentWidth(),
-                                value = caption,
-                                onValueChange = {
-                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(it))
-                                },
-                                label = { Text("Caption: What's your best idea?") }
+                                text = caption
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Button(

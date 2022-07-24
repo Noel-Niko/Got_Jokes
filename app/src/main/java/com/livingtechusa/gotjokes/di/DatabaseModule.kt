@@ -24,6 +24,7 @@ class DatabaseModule {
     fun provideJokeDao(appDatabase: AppDatabase): JokeDao {
         return appDatabase.jokeDao()
     }
+
     @Provides
     @Singleton
     fun provideAppDatabase(@ApplicationContext appContext: Context):
@@ -32,6 +33,8 @@ class DatabaseModule {
             appContext,
             AppDatabase::class.java,
             Constants.DATABASE_NAME
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 }

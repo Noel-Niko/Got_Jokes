@@ -1,6 +1,7 @@
 package com.livingtechusa.gotjokes.ui.build
 
 import androidx.navigation.NavHostController
+import com.livingtechusa.gotjokes.data.database.entity.JokeEntity
 
 sealed class BuildEvent {
 
@@ -16,5 +17,9 @@ sealed class BuildEvent {
 
     object Save : BuildEvent()
 
-    object Delete : BuildEvent()
+    data class Delete(
+        val joke: JokeEntity
+        ) : BuildEvent()
+
+    object UpdateColor : BuildEvent()
 }

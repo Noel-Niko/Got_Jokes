@@ -8,19 +8,18 @@ import com.livingtechusa.gotjokes.data.database.entity.ImageSearchEntity
 import com.livingtechusa.gotjokes.data.database.entity.JokeEntity
 import java.util.Date
 
-fun Joke.toEntity() = JokeEntity(
-    id,
-    imageUrl,
-    caption,
-    dateAdded
-)
-
-fun JokeEntity.toModel() = Joke(
-    id,
-    imageUrl,
-    caption,
-    dateAdded
-)
+//fun Joke.toEntity() = JokeEntity(
+//    imageUrl,
+//    caption,
+//    dateAdded
+//)
+//
+//
+//fun JokeEntity.toModel() = Joke(
+//    imageUrl,
+//    caption,
+//    dateAdded
+//)
 
 fun ImgFlip.Data.Meme.toImageSearchEntity() = ImageSearchEntity(
     url,
