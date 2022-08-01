@@ -1,5 +1,7 @@
 package com.livingtechusa.gotjokes.ui.build
 
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.navigation.NavHostController
 import com.livingtechusa.gotjokes.data.database.entity.JokeEntity
 
@@ -15,7 +17,9 @@ sealed class BuildEvent {
         val text: String
     ) : BuildEvent()
 
-    object Save : BuildEvent()
+    data class Save(
+        val imgURI: Uri
+    ) : BuildEvent()
 
     data class Delete(
         val joke: JokeEntity

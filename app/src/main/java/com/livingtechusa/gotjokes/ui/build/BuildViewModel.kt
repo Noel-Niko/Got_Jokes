@@ -62,7 +62,7 @@ class BuildViewModel @Inject constructor(
     private val _yodaSpeak = MutableStateFlow(String())
     val yodaSpeak: StateFlow<String> get() = _yodaSpeak
 
-    private val _yoMamma = MutableStateFlow(YoMamma(null))
+    private val _yoMamma = MutableStateFlow(YoMamma(""))
     val yoMamma: StateFlow<YoMamma> get() = _yoMamma
 
     private val _randomFact = MutableStateFlow(RandomFact())
@@ -147,13 +147,15 @@ class BuildViewModel @Inject constructor(
                         _caption.value = event.text
                     }
                     is Save -> {
-                        val joke = JokeEntity(
-                            imageUrl = imageUrl.value.toString(),
-                            caption = caption.value,
-                            dateAdded = Date(System.currentTimeMillis())
-                        )
-                        localService.insertJoke(joke)
-                    }
+                            val joke = JokeEntity(
+                                imageUrl = imageUrl.value.toString(),
+                                caption = caption.value,
+                                dateAdded = Date(System.currentTimeMillis()),
+                                imgURI = event.imgURI
+                            )
+                            localService.insertJoke(joke)
+                        }
+
                     is Delete -> {
                         viewModelScope.launch {
                             localService.deleteJoke(joke = event.joke)
@@ -362,6 +364,7 @@ class BuildViewModel @Inject constructor(
             _loading = false
         }
     }
+
 
 
 }

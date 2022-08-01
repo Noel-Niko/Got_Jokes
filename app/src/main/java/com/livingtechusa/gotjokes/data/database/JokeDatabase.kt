@@ -12,7 +12,7 @@ import com.livingtechusa.gotjokes.data.database.entity.JokeEntity
 @Database(
     entities =
     [ImageSearchEntity::class, JokeEntity::class],
-    version = 2,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
