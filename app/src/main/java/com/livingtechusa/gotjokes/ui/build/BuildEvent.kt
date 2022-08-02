@@ -18,7 +18,7 @@ sealed class BuildEvent {
     ) : BuildEvent()
 
     data class Save(
-        val imgURI: Uri
+        var imgURI: Uri
     ) : BuildEvent()
 
     data class Delete(

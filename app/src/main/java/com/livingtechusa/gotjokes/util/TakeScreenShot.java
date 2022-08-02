@@ -97,9 +97,16 @@ import java.io.*;
 import java.util.Date;
 import java.util.Objects;
 
+import static com.livingtechusa.gotjokes.util.EditPhotoKt.EditPhoto;
+import static com.livingtechusa.gotjokes.util.FindActivityKt.findActivity;
+
 public class TakeScreenShot {
 
-    public static Uri takeScreenShot(View view, String fileName) {
+    public static Uri takeScreenShot(View view, String caption) {
+        Integer length = caption.length() / 3;
+        String fileName = caption.substring(0, length);
+        fileName = fileName.replaceAll("\\s", "_");
+        fileName = fileName.replace(".", "-");
         Date date = new Date();
         CharSequence formatedDate = DateFormat.format("yyyy-MM-dd_hh:mm:ss", date);
 
@@ -117,13 +124,13 @@ public class TakeScreenShot {
                     view.getDrawingCache()
             );
             view.setDrawingCacheEnabled(false);
-
-
-
-
             if(Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
                 String filePath = fileName + "-" + formatedDate;
                 Uri imageUri = saveImage(bitmap, filePath);
+//                Intent intent= new Intent(Intent.ACTION_EDIT);
+//                intent.setDataAndType(imageUri, "image/*");
+//                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                findActivity().startActivity(Intent.createChooser(intent, null));
                 return imageUri;
             }
             File imageFile = new File(path);

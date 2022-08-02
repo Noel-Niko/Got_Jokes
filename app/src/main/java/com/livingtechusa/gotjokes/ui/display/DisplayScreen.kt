@@ -36,27 +36,29 @@ import com.livingtechusa.gotjokes.R
 import com.livingtechusa.gotjokes.ui.build.BuildEvent
 import com.livingtechusa.gotjokes.ui.build.BuildViewModel
 import com.livingtechusa.gotjokes.ui.components.DisplayImgCard
+import com.livingtechusa.gotjokes.util.EditPhoto
 import com.livingtechusa.gotjokes.util.TakeScreenShot
 import com.livingtechusa.gotjokes.util.findActivity
 import kotlin.math.roundToInt
 
 @Composable
 fun DisplayScreen() {
-//    val result = remember { mutableStateOf<Bitmap?>(null) }
-//        val launcher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) {
-//            result.value = it
-//        }
-//
-////        Button(onClick = { launcher.launch() }) {
-////            Text(text = "Take a picture")
-////        }
-//
-//        result.value?.let { image ->
-//            Image(image.asImageBitmap(), null, modifier = Modifier.fillMaxWidth())
-//        }
-//
-//    AccessibilityService.GLOBAL_ACTION_TAKE_SCREENSHOT
-//AccessibilityService.ScreenshotResult()\
+    //    val result = remember { mutableStateOf<Bitmap?>(null) }
+    //        val launcher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) {
+    //            result.value = it
+    //        }
+    //
+    ////        Button(onClick = { launcher.launch() }) {
+    ////            Text(text = "Take a picture")
+    ////        }
+    //
+    //        result.value?.let { image ->
+    //            Image(image.asImageBitmap(), null, modifier = Modifier.fillMaxWidth())
+    //        }
+    //
+    //    AccessibilityService.GLOBAL_ACTION_TAKE_SCREENSHOT
+    //AccessibilityService.ScreenshotResult()\
+
     val activity = findActivity()
     TakeScreenShot.verifyStoragePermission(
         activity
@@ -117,33 +119,22 @@ fun DisplayScreen() {
                             color = textColor
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-//                        val snapShot = CaptureBitmap {
-//                            DisplayScreen()
-//                        }
+                        //                        val snapShot = CaptureBitmap {
+                        //                            DisplayScreen()
+                        //                        }
                         Button(
                             modifier = Modifier.align(Alignment.CenterHorizontally),
                             onClick = {
-                                // Caution : needs to be done on click action
-                                // ui must be visible/laid out before calling this
-//                                val bitmap = snapShot.invoke()
-//                                try {
-//                                    FileOutputStream("Storage/Pictures/Got Jokes").use { out ->
-//                                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-//                                    }
-//                                } catch (e: IOException) {
-//                                    e.printStackTrace()
-//                                }
-                                try{
-                                    val length: Int = caption.length / 4
+                                try {
                                     val imageUri = TakeScreenShot.takeScreenShot(
-                                    activity.window.decorView.rootView, caption.substring(0, length)
-                                )
-                                val uri: Uri = imageUri
-                                buildViewModel.onTriggerEvent(BuildEvent.Save(uri))
+                                        activity.window.decorView.rootView, caption
+                                    )
+                                    val uri: Uri = imageUri
+                                    buildViewModel.onTriggerEvent(BuildEvent.Save(uri))
                                     Toast.makeText(activity, "Saved", Toast.LENGTH_SHORT).show()
-                            } catch (e: Exception) {
+                                } catch (e: Exception) {
                                     val TAG = "ScreenShot"
-                                    Log.e(TAG, "Error message: " + e.message + " with cause " + e.cause )
+                                    Log.e(TAG, "Error message: " + e.message + " with cause " + e.cause)
                                     Toast.makeText(activity, "Unable to save. \n Error: " + e.cause, Toast.LENGTH_SHORT).show()
                                 }
                             }

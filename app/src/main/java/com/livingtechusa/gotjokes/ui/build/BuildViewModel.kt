@@ -1,5 +1,6 @@
 package com.livingtechusa.gotjokes.ui.build
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
@@ -29,6 +30,7 @@ import com.livingtechusa.gotjokes.network.RandomFactsApiService
 import com.livingtechusa.gotjokes.network.YoMammaApi
 import com.livingtechusa.gotjokes.network.YodaApiService
 import com.livingtechusa.gotjokes.ui.build.BuildEvent.*
+import com.livingtechusa.gotjokes.util.EditPhoto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDateTime
 import java.util.Date
@@ -94,6 +96,7 @@ class BuildViewModel @Inject constructor(
 
     init {
         _loading = true
+        _color.value = Color.Black
         getImages()
         getYoMammaJokes()
         getRandomFacts()

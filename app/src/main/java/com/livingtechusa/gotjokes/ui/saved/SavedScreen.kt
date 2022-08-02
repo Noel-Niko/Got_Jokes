@@ -59,18 +59,14 @@ fun SavedScreen() {
                                 .fillMaxWidth()
                                 .padding(8.dp)
                                 .clickable {
-                                    buildViewModel.onTriggerEvent(BuildEvent.Delete(joke))
+                                           //TODO: connect to send or delete via toast
+                                    //buildViewModel.onTriggerEvent(BuildEvent.Delete(joke))
                                 },
 
                         ) {
-                            //joke.imgURI?.let { MemeImgCard(uri = it) } ?: DisplayImgCard(url = joke.imageUrl)
-                            DisplayImgCard(url = joke.imageUrl)
+                            joke.imgURI?.let { MemeImgCard(uri = it) } ?: DisplayImgCard(url = joke.imageUrl)
+                            //DisplayImgCard(url = joke.imageUrl)
                             Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                modifier = Modifier.fillMaxSize(),
-                                text = joke.caption
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
                         }
                     }
                 }
