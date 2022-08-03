@@ -82,14 +82,19 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.app.ActivityCompat;
 import com.livingtechusa.gotjokes.BaseApplication;
 
@@ -97,6 +102,8 @@ import java.io.*;
 import java.util.Date;
 import java.util.Objects;
 
+import static android.graphics.Bitmap.Config.RGB_565;
+import static androidx.activity.result.ActivityResultCallerKt.registerForActivityResult;
 import static com.livingtechusa.gotjokes.util.EditPhotoKt.EditPhoto;
 import static com.livingtechusa.gotjokes.util.FindActivityKt.findActivity;
 
@@ -110,6 +117,7 @@ public class TakeScreenShot {
         Date date = new Date();
         CharSequence formatedDate = DateFormat.format("yyyy-MM-dd_hh:mm:ss", date);
 
+        view.setPadding(0, 300, 0, 775);
         try {
             String dirPath = Environment.getExternalStorageDirectory().toString() + "/Got_Jokes";
             File fileDir = new File(dirPath);
@@ -131,6 +139,18 @@ public class TakeScreenShot {
 //                intent.setDataAndType(imageUri, "image/*");
 //                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 //                findActivity().startActivity(Intent.createChooser(intent, null));
+// Open a specific media item using ParcelFileDescriptor.
+//                ContentResolver resolver = BaseApplication.getInstance().getContentResolver();
+//                // "rw" for read-and-write;
+//                // "rwt" for truncating or overwriting existing file contents.
+//                String readAndWriteMode = "rwt";
+//                try (ParcelFileDescriptor image =
+//                             resolver.openFileDescriptor(imageUri, readAndWriteMode)) {
+//                    Log.i("results", "The results");
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+                view.setPadding(0,0,0,0);
                 return imageUri;
             }
             File imageFile = new File(path);
@@ -140,6 +160,7 @@ public class TakeScreenShot {
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
             fileOutputStream.flush();
             fileOutputStream.close();
+            view.setPadding(0,0,0,0);
             return Uri.fromFile(BaseApplication.getInstance().getFileStreamPath(imageFile.getName()));
 
         } catch (Exception e) {
@@ -148,6 +169,16 @@ public class TakeScreenShot {
         }
         return null;
     }
+
+//    ActivityResultLauncher<String> mGetContent =
+//
+//    private Uri registerForActivityResult(new ActivityResultContracts.GetContent(),
+//    new ActivityResultCallback<Uri>() {
+//        @Override
+//        public void onActivityResult(Uri uri) {
+//            // Handle the returned Uri
+//        }
+//    });
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSION_STORAGE = {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,

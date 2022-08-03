@@ -56,7 +56,7 @@ fun SavedScreen() {
                     jokeList?.forEach { joke ->
                         Column(
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .fillMaxSize()
                                 .padding(8.dp)
                                 .clickable {
                                            //TODO: connect to send or delete via toast

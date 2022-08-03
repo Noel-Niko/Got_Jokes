@@ -1,10 +1,19 @@
 package com.livingtechusa.gotjokes.ui.build
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.net.Uri
+import android.provider.MediaStore
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.*
+import com.livingtechusa.gotjokes.BaseApplication
+import com.livingtechusa.gotjokes.MainActivity
 import com.livingtechusa.gotjokes.data.api.ApiConstants.PEXEL_API_KEY
 import com.livingtechusa.gotjokes.data.api.model.Advice
 import com.livingtechusa.gotjokes.data.api.model.CatFact
@@ -31,6 +40,7 @@ import com.livingtechusa.gotjokes.network.YoMammaApi
 import com.livingtechusa.gotjokes.network.YodaApiService
 import com.livingtechusa.gotjokes.ui.build.BuildEvent.*
 import com.livingtechusa.gotjokes.util.EditPhoto
+import com.livingtechusa.gotjokes.util.findActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDateTime
 import java.util.Date
@@ -116,7 +126,6 @@ class BuildViewModel @Inject constructor(
 
     }
 
-
     fun onTriggerEvent(event: BuildEvent) {
         viewModelScope.launch {
             try {
@@ -150,11 +159,32 @@ class BuildViewModel @Inject constructor(
                         _caption.value = event.text
                     }
                     is Save -> {
+
+                        var imageUri = event.imgURI
+//                        val openDocument = rememberLauncherForActivityResult(
+//                            contract = ActivityResultContracts.OpenDocument(),
+//                        ) { uri ->
+//                            uri?.let {
+//                                    imageUri = it
+//                            }
+//                         }
+//    val getPictureIntent = Intent(MediaStore.ACTION_REVIEW)
+//    try {
+//        startActivityForResult(MainActivity(), getPictureIntent, 0, null)
+//    } catch (e: ActivityNotFoundException) {
+//        // display error state to the user
+//    }
+//                        val shareIntent: Intent = Intent().apply {
+//                            action = Intent.ACTION_SEND
+//                            putExtra(Intent.EXTRA_STREAM, imageUri)
+//                            type = "image/jpeg"
+//                        }
+//                      BaseApplication.getInstance().applicationContext.startActivity(Intent.createChooser(shareIntent, null), null)
                             val joke = JokeEntity(
                                 imageUrl = imageUrl.value.toString(),
                                 caption = caption.value,
                                 dateAdded = Date(System.currentTimeMillis()),
-                                imgURI = event.imgURI
+                                imgURI = imageUri
                             )
                             localService.insertJoke(joke)
                         }

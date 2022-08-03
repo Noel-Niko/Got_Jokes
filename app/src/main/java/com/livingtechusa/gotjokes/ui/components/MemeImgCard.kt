@@ -50,25 +50,24 @@ fun MemeImgCard(uri: Uri) {
             Image(
                 painter = imagePainter,
                 contentDescription = "Random Image",
+                contentScale = ContentScale.Inside,
                 modifier = Modifier
-                    .fillMaxSize(),
-                contentScale = ContentScale.Fit
+                    .fillMaxSize()
             )
         }
     } else {
         Card(
             shape = MaterialTheme.shapes.medium,
             modifier = Modifier
-                .height(maxDimention)
-                .fillMaxWidth(),
-            elevation = 0.dp
+                .fillMaxSize(),
+            elevation = 6.dp
         ) {
             Image(
                 painter = imagePainter,
-                contentDescription = "Random Image",
+                contentDescription = "Image",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .fillMaxSize(),
-                contentScale = ContentScale.Fit
+                    .height(maxDimention)
             )
         }
     }

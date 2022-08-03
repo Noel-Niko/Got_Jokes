@@ -1,6 +1,8 @@
 package com.livingtechusa.gotjokes.ui.display
 
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.Rect
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
@@ -26,17 +29,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.applyCanvas
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.livingtechusa.gotjokes.R
 import com.livingtechusa.gotjokes.ui.build.BuildEvent
 import com.livingtechusa.gotjokes.ui.build.BuildViewModel
 import com.livingtechusa.gotjokes.ui.components.DisplayImgCard
-import com.livingtechusa.gotjokes.util.EditPhoto
 import com.livingtechusa.gotjokes.util.TakeScreenShot
 import com.livingtechusa.gotjokes.util.findActivity
 import kotlin.math.roundToInt
@@ -63,6 +70,7 @@ fun DisplayScreen() {
     TakeScreenShot.verifyStoragePermission(
         activity
     )
+
     val configuration = LocalConfiguration.current
     if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
         DisplayScreenLandscape()
@@ -94,15 +102,15 @@ fun DisplayScreen() {
                             .fillMaxSize()
                             .padding(8.dp)
                     ) {
-                        Spacer(Modifier.height(16.dp))
+                        Spacer(Modifier.height(150.dp))
                         if (image != null) {
                             DisplayImgCard(url = image!!)
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
                         var offsetY by remember { mutableStateOf(0f) }
                         Text(
                             modifier = Modifier
-                                .padding(24.dp)
+                                .padding(28.dp, 0.dp, 28.dp, 0.dp)
                                 .align(Alignment.CenterHorizontally)
                                 .offset { IntOffset(0, offsetY.roundToInt()) }
                                 .draggable(
@@ -118,18 +126,18 @@ fun DisplayScreen() {
                             fontSize = 20.sp,
                             color = textColor
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        //                        val snapShot = CaptureBitmap {
-                        //                            DisplayScreen()
-                        //                        }
+                        Spacer(modifier = Modifier.height(36.dp))
+
                         Button(
                             modifier = Modifier.align(Alignment.CenterHorizontally),
                             onClick = {
                                 try {
+
                                     val imageUri = TakeScreenShot.takeScreenShot(
-                                        activity.window.decorView.rootView, caption
+                                        activity.window.decorView, caption
                                     )
                                     val uri: Uri = imageUri
+
                                     buildViewModel.onTriggerEvent(BuildEvent.Save(uri))
                                     Toast.makeText(activity, "Saved", Toast.LENGTH_SHORT).show()
                                 } catch (e: Exception) {
@@ -146,4 +154,30 @@ fun DisplayScreen() {
             }
         }
     }
+
+//    var capturingViewBounds by remember { mutableStateOf<Rect?>(null) }
+//
+//    val context = LocalContext.current
+//    var view = LocalView.current
+//
+//    Column(
+//        modifier = Modifier
+//            .padding(top = 8.dp)
+//            .height(390.dp)
+//            .width(300.dp)
+//            .onGloballyPositioned {
+//                capturingViewBounds = it.boundsInRoot()
+//            },
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        val bounds = capturingViewBounds
+//        var bitmap = Bitmap.createBitmap(
+//            bounds?.width?.roundToInt()!!, bounds.height.roundToInt(),
+//            Bitmap.Config.ARGB_8888
+//        ).applyCanvas {
+//            translate(-bounds.left, -bounds.top)
+//            view.draw(this)
+//        }
+//
+//    }
 }
