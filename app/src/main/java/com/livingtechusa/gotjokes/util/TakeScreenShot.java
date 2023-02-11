@@ -34,9 +34,10 @@ public class TakeScreenShot {
         fileName = fileName.replace(".", "-");
         Date date = new Date();
         CharSequence formatedDate = DateFormat.format("yyyy-MM-dd_hh:mm:ss", date);
-        Integer fifth = ((int) height.getValue() / 5 );
+        Integer top = ((int) height.getValue() / 5 );
+        double bottom = (top * 1.5);
 
-        view.setPadding(0, fifth, 0, fifth);
+        view.setPadding(0, top, 0, (int)bottom);
         try {
             String dirPath = Environment.getExternalStorageDirectory().toString() + "/Got_Jokes";
             File fileDir = new File(dirPath);
@@ -54,21 +55,6 @@ public class TakeScreenShot {
             if(Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
                 String filePath = fileName + "-" + formatedDate;
                 Uri imageUri = saveImage(bitmap, filePath);
-//                Intent intent= new Intent(Intent.ACTION_EDIT);
-//                intent.setDataAndType(imageUri, "image/*");
-//                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                findActivity().startActivity(Intent.createChooser(intent, null));
-// Open a specific media item using ParcelFileDescriptor.
-//                ContentResolver resolver = BaseApplication.getInstance().getContentResolver();
-//                // "rw" for read-and-write;
-//                // "rwt" for truncating or overwriting existing file contents.
-//                String readAndWriteMode = "rwt";
-//                try (ParcelFileDescriptor image =
-//                             resolver.openFileDescriptor(imageUri, readAndWriteMode)) {
-//                    Log.i("results", "The results");
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
                 view.setPadding(0,0,0,0);
                 return imageUri;
             }

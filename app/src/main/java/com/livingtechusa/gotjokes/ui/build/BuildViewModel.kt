@@ -1,14 +1,17 @@
 package com.livingtechusa.gotjokes.ui.build
 
+import android.content.ContentResolver
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.util.Log
 import android.view.View
 import android.view.Window
-import android.view.PixelCopy
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.Color
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
+import com.livingtechusa.gotjokes.BaseApplication
 import com.livingtechusa.gotjokes.data.api.ApiConstants.PEXEL_API_KEY
 import com.livingtechusa.gotjokes.data.api.model.Advice
 import com.livingtechusa.gotjokes.data.api.model.CatFact
@@ -35,12 +38,12 @@ import com.livingtechusa.gotjokes.network.YoMammaApi
 import com.livingtechusa.gotjokes.network.YodaApiService
 import com.livingtechusa.gotjokes.ui.build.BuildEvent.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDateTime
-import java.util.Date
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.util.Date
+import javax.inject.Inject
 
 const val STATE_KEY_URL = "com.livingtechusa.gotjokes.ui.build.joke.url"
 
@@ -54,6 +57,8 @@ class BuildViewModel @Inject constructor(
     //    private val _status = MutableStateFlow(ApiStatus.PRE_INIT)
     //    val status: StateFlow<ApiStatus>
     //        get() = _status
+    private val context: Context
+        get() = BaseApplication.getInstance()
 
     private val _imageList = MutableStateFlow(emptyList<ImageSearchEntity>())
     val imageList: StateFlow<List<ImageSearchEntity>> get() = _imageList
@@ -133,6 +138,7 @@ class BuildViewModel @Inject constructor(
                         getCatFact()
                         getDogFact()
                     }
+
                     is GetNewImage -> {
                         _caption.value = ""
                         getImage()
@@ -144,14 +150,17 @@ class BuildViewModel @Inject constructor(
                         getCatFact()
                         getDogFact()
                     }
+
                     is ConvertToYodaSpeak -> {
                         ConvertToTextToYodaSpeak(event.text)
                     }
+
                     is UpdateCaption -> {
                         _caption.value = event.text
                     }
+
                     is Save -> {
-                        var imageUri = event.imgURI
+                        val imageUri = event.imgURI
 //                        val openDocument = rememberLauncherForActivityResult(
 //                            contract = ActivityResultContracts.OpenDocument(),
 //                        ) { uri ->
@@ -171,20 +180,40 @@ class BuildViewModel @Inject constructor(
 //                            type = "image/jpeg"
 //                        }
 //                      BaseApplication.getInstance().applicationContext.startActivity(Intent.createChooser(shareIntent, null), null)
-                            val joke = JokeEntity(
-                                imageUrl = imageUrl.value.toString(),
-                                caption = caption.value,
-                                dateAdded = Date(System.currentTimeMillis()),
-                                imgURI = imageUri
-                            )
-                            localService.insertJoke(joke)
-                        }
+                        val joke = JokeEntity(
+                            imageUrl = imageUrl.value.toString(),
+                            caption = caption.value,
+                            dateAdded = Date(System.currentTimeMillis()),
+                            imgURI = imageUri
+                        )
+                        localService.insertJoke(joke)
+                    }
 
                     is Delete -> {
                         viewModelScope.launch {
                             localService.deleteJoke(joke = event.joke)
                         }
                     }
+
+                    is Share -> {
+                        val meme = event.joke.imgURI
+                        val shareIntent = Intent()
+                        shareIntent.action = Intent.ACTION_SEND
+                        val resolver: ContentResolver = context.contentResolver
+                        shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
+                        shareIntent.type = "image/*"
+                        shareIntent.setDataAndType(meme, meme?.let { resolver.getType(it) })
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, meme)
+                        shareIntent.putExtra(
+                            Intent.EXTRA_TEXT,
+                            "\n\nCreated with Got Jokes, available on Google Play."
+                        )
+                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        shareIntent.action = Intent.ACTION_SEND
+                        ContextCompat.startActivity(context, shareIntent, null)
+                    }
+
                     is UpdateColor -> {
                         when (_color.value) {
                             Color.Black -> _color.value = Color.Gray
@@ -194,6 +223,10 @@ class BuildViewModel @Inject constructor(
                             Color.Blue -> _color.value = Color.Black
                             else -> _color.value = Color.Black
                         }
+                    }
+
+                    is ResetColor -> {
+                        _color.value = Color.Black
                     }
                 }
 
@@ -215,7 +248,8 @@ class BuildViewModel @Inject constructor(
             // check database
             // if not empty remove images > 2 weeks old
             val dbImages = localService.getAllImages()
-            val twoWeeksAgo: Date = convertLocalDateTimeToDate(LocalDateTime.now().minusWeeks(2L)) ?: Date(System.currentTimeMillis())
+            val twoWeeksAgo: Date = convertLocalDateTimeToDate(LocalDateTime.now().minusWeeks(2L))
+                ?: Date(System.currentTimeMillis())
             localService.clearOldImages(twoWeeksAgo)
 
             if (dbImages.size < 200) {

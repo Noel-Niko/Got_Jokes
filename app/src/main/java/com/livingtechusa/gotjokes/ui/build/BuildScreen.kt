@@ -19,11 +19,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.livingtechusa.gotjokes.R
 import com.livingtechusa.gotjokes.ui.components.DisplayImgCard
 
 
@@ -84,7 +89,8 @@ fun BuildScreen() {
                         Spacer(modifier = Modifier.height(16.dp))
                         ClickableText(
                             modifier = Modifier.fillMaxWidth(),
-                            text = AnnotatedString("Convert Caption to Yoda Speak"),
+                            text = AnnotatedString(
+                                text = stringResource(R.string.convert_caption_to_yoda_speak)),
                             onClick = {
                                 buildViewModel.onTriggerEvent(BuildEvent.ConvertToYodaSpeak(caption))
                             }

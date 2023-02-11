@@ -25,10 +25,8 @@ import com.livingtechusa.gotjokes.ui.build.BuildViewModel
 
 @Composable
 fun DisplayImgCard(url: String) {
-    val buildViewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
-    val caption by buildViewModel.caption.collectAsState()
+    //val buildViewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
     val configuration = LocalConfiguration.current
-    val scrollState = rememberScrollState()
     val maxDimention: Dp =
         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             configuration.screenHeightDp.dp

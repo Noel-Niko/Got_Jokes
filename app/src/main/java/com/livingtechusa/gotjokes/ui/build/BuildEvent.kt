@@ -26,4 +26,9 @@ sealed class BuildEvent {
         ) : BuildEvent()
 
     object UpdateColor : BuildEvent()
+
+    object ResetColor : BuildEvent()
+    data class Share(
+        val joke: JokeEntity
+    ) : BuildEvent()
 }

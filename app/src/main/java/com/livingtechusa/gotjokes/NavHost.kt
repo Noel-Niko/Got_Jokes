@@ -24,10 +24,7 @@ fun NavHost(
         }
         composable(
             route = Display.route,
-            //arguments = Display.arguments,
-        ) { navBackStackEntry ->
-            //           val meme =
-            //           navBackStackEntry.arguments?.getString(Display.accountTypeArg)
+        ) {
             DisplayScreen()
         }
         composable(route = Saved.route) {

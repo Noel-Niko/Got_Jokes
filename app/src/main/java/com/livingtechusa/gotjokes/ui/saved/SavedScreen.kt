@@ -3,6 +3,7 @@ package com.livingtechusa.gotjokes.ui.saved
 
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,11 +24,17 @@ import com.livingtechusa.gotjokes.ui.build.BuildEvent
 import com.livingtechusa.gotjokes.ui.build.BuildViewModel
 import com.livingtechusa.gotjokes.ui.components.DisplayImgCard
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.navigation.NavHostController
+import com.livingtechusa.gotjokes.ui.components.ConfirmDeleteListDialog
 import com.livingtechusa.gotjokes.ui.components.MemeImgCard
 
 @Composable
-fun SavedScreen() {
+fun SavedScreen(         ) {
     val configuration = LocalConfiguration.current
+
     if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
         SavedScreenLandscape()
     } else {
@@ -54,16 +61,23 @@ fun SavedScreen() {
             } else {
                 item {
                     jokeList?.forEach { joke ->
+                        val delete = remember { mutableStateOf(false) }
+                        if(delete.value) { ConfirmDeleteListDialog(joke) }
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(8.dp)
-                                .clickable {
-                                           //TODO: connect to send or delete via toast
-
-                                    //buildViewModel.onTriggerEvent(BuildEvent.Delete(joke))
-                                },
-
+                                .pointerInput(key1 = joke) {
+                                    detectTapGestures(
+                                        onLongPress = {
+                                            // Launch dialog
+                                            delete.value = true
+                                        },
+                                        onTap = {
+                                            buildViewModel.onTriggerEvent(BuildEvent.Share(joke))
+                                        }
+                                    )
+                                }
                         ) {
                             joke.imgURI?.let { MemeImgCard(uri = it) } ?: DisplayImgCard(url = joke.imageUrl)
                             //DisplayImgCard(url = joke.imageUrl)
