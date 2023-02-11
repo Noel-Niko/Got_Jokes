@@ -22,7 +22,7 @@ private val imgFlipRetrofit = Retrofit.Builder()
  */
 interface ImgFlipApiService {
     @GET(ApiConstants.END_POINT_IMGFLIP)
-    suspend fun getImgFlipMeme():  ImgFlip
+    suspend fun getImgFlipMeme():  ImgFlip?
 }
 
 /**

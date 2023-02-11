@@ -60,11 +60,13 @@ fun SavedScreen() {
                                 .padding(8.dp)
                                 .clickable {
                                            //TODO: connect to send or delete via toast
+
                                     //buildViewModel.onTriggerEvent(BuildEvent.Delete(joke))
                                 },
 
                         ) {
                             joke.imgURI?.let { MemeImgCard(uri = it) } ?: DisplayImgCard(url = joke.imageUrl)
+                            //DisplayImgCard(url = joke.imageUrl)
                             //DisplayImgCard(url = joke.imageUrl)
                             Spacer(modifier = Modifier.height(2.dp))
                         }

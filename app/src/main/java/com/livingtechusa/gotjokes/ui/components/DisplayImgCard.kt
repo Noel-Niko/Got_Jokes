@@ -49,7 +49,7 @@ fun DisplayImgCard(url: String) {
                 .width(maxDimention)
                 .fillMaxHeight()
                 .padding(4.dp),
-            elevation = 0.dp
+            elevation = 6.dp
         ) {
             Image(
                 painter = imagePainter,
@@ -65,7 +65,7 @@ fun DisplayImgCard(url: String) {
             modifier = Modifier
                 .height(maxDimention)
                 .fillMaxWidth(),
-            elevation = 0.dp
+            elevation = 6.dp
         ) {
             Image(
                 painter = imagePainter,

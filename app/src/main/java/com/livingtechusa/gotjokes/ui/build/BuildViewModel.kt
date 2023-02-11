@@ -1,19 +1,14 @@
 package com.livingtechusa.gotjokes.ui.build
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.net.Uri
-import android.provider.MediaStore
+import android.graphics.Bitmap
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import android.view.View
+import android.view.Window
+import android.view.PixelCopy
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.Color
-import androidx.core.app.ActivityCompat.startActivityForResult
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.*
-import com.livingtechusa.gotjokes.BaseApplication
-import com.livingtechusa.gotjokes.MainActivity
 import com.livingtechusa.gotjokes.data.api.ApiConstants.PEXEL_API_KEY
 import com.livingtechusa.gotjokes.data.api.model.Advice
 import com.livingtechusa.gotjokes.data.api.model.CatFact
@@ -39,8 +34,6 @@ import com.livingtechusa.gotjokes.network.RandomFactsApiService
 import com.livingtechusa.gotjokes.network.YoMammaApi
 import com.livingtechusa.gotjokes.network.YodaApiService
 import com.livingtechusa.gotjokes.ui.build.BuildEvent.*
-import com.livingtechusa.gotjokes.util.EditPhoto
-import com.livingtechusa.gotjokes.util.findActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDateTime
 import java.util.Date
@@ -115,7 +108,6 @@ class BuildViewModel @Inject constructor(
         getDadJoke()
         getCatFact()
         getDogFact()
-
         //        if (state.get<String>(STATE_KEY_URL) == "com.livingtechusa.gotjokes.ui.build.joke.url") {
         //            state.get<String>(STATE_KEY_URL)?.let { imgFlipUrl ->
         //                joke.image = imgFlipUrl
@@ -159,7 +151,6 @@ class BuildViewModel @Inject constructor(
                         _caption.value = event.text
                     }
                     is Save -> {
-
                         var imageUri = event.imgURI
 //                        val openDocument = rememberLauncherForActivityResult(
 //                            contract = ActivityResultContracts.OpenDocument(),
@@ -229,8 +220,8 @@ class BuildViewModel @Inject constructor(
 
             if (dbImages.size < 200) {
                 // ImgFLip
-                val imgFlipResult: ImgFlip = ImgFlipApi.retrofitService.getImgFlipMeme()
-                localService.insertImgFlipMemeImageList(imgFlipResult.data.memes)
+                val imgFlipResult: ImgFlip? = ImgFlipApi.retrofitService.getImgFlipMeme()
+                imgFlipResult?.data?.memes?.let { localService.insertImgFlipMemeImageList(it) }
 
                 // Google Results
                 val googleImageResult = GoogleImageApi.retrofitService.getGoogleImages()
@@ -287,7 +278,9 @@ class BuildViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val result = YoMammaApi.retrofitService.getYoMammaJoke()
-                _yoMamma.value = result
+                if (result != null) {
+                    _yoMamma.value = result
+                }
             } catch (e: Exception) {
                 Log.i("YoMamma", e.message + " with cause " + e.cause)
             }
@@ -398,6 +391,20 @@ class BuildViewModel @Inject constructor(
         }
     }
 
+    private val _screenshot = MutableLiveData<Bitmap>()
+    val screenshot: LiveData<Bitmap> = _screenshot
+
+    fun copyViewScreenshotIntoBitmap(view: View, window: Window) {
+//        PixelCopyHelper.getViewBitmap(view, window, object : PixelCopyHelper.PixelCopyListener {
+//            override fun onCopySuccess(bitmap: Bitmap) {
+//                _screenshot.postValue(bitmap)
+//            }
+//
+//            override fun onCopyError() {
+//                // Handle error case
+//            }
+//        })
+    }
 
 
 }

@@ -26,7 +26,7 @@ private val PexelRetrofit = Retrofit.Builder()
  */
 interface PexelApiService {
     @GET(ApiConstants.END_POINT_PEXEL)
-    suspend fun getPexelMeme(@Header("Authorization") auth: String, @Query("page") page: String):  Pexel
+    suspend fun getPexelMeme(@Header("Authorization") auth: String, @Query("page") page: String):  Pexel?
 }
 
 /**

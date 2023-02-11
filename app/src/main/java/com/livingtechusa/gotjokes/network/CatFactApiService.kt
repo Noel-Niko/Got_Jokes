@@ -15,7 +15,7 @@ private val catFactRetrofit = Retrofit.Builder()
 
 interface CatFactApiService {
     @GET(ApiConstants.END_POINT_CAT_FACTS)
-    suspend fun getcatFact(): CatFact
+    suspend fun getcatFact(): CatFact?
 
     object CatFactApi {
         val retrofitService: CatFactApiService by lazy {

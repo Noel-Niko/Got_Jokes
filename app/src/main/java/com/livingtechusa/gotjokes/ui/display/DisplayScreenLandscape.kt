@@ -46,8 +46,8 @@ fun DisplayScreenLandscape() {
         val caption by buildViewModel.caption.collectAsState()
         val image by buildViewModel.imageUrl.collectAsState()
         val scrollState = rememberScrollState()
-        val maxHeight = configuration.screenHeightDp
-
+        val height = configuration.screenHeightDp
+        val width = configuration.screenWidthDp
         LazyRow(
             modifier = Modifier
                 .fillMaxSize()
@@ -86,7 +86,7 @@ fun DisplayScreenLandscape() {
                         ) {
                             Text(
                                 modifier = Modifier
-                                    .width(maxHeight.dp)
+                                    .width(height.dp)
                                     .wrapContentWidth(),
                                 text = caption
                             )
@@ -94,7 +94,8 @@ fun DisplayScreenLandscape() {
                             Button(
                                 onClick = {
                                     val imageUri = TakeScreenShot.takeScreenShot(
-                                        activity.window.decorView.rootView, caption
+                                        activity.window.decorView.rootView, caption,
+                                        (height*2).dp, width.dp
                                     )
                                    val uri: Uri = imageUri
                                     buildViewModel.onTriggerEvent(BuildEvent.Save(uri))

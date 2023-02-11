@@ -16,7 +16,7 @@ private val yoMammaRetrofit = Retrofit.Builder()
 
 interface YoMammaApiService {
     @GET(END_POINT_YOMAMMA)
-    suspend fun getYoMammaJoke(): YoMamma
+    suspend fun getYoMammaJoke(): YoMamma?
 }
 
 object YoMammaApi {

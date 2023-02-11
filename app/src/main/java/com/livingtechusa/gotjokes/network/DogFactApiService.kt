@@ -15,7 +15,7 @@ private val dogFactRetrofit = Retrofit.Builder()
 
 interface DogFactApiService {
     @GET(ApiConstants.END_POINT_DOG_FACTS)
-    suspend fun getDogFact(): DogFact
+    suspend fun getDogFact(): DogFact?
 
     object DogFactApi {
         val retrofitService: DogFactApiService by lazy {

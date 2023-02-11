@@ -1,123 +1,42 @@
 package com.livingtechusa.gotjokes.util;
 
 
-//
-//
-//import android.app.Activity;
-//import android.content.Context;
-//import android.content.Intent;
-//import android.graphics.Bitmap;
-//import android.net.Uri;
-//import android.os.Environment;
-//import android.os.Handler;
-//import android.os.Looper;
-//import android.view.View;
-//
-//import java.io.File;
-//import java.io.FileOutputStream;
-//import java.util.Date;
-//import java.util.function.Supplier;
-//
-//public class TakeScreenShot {
-//
-//    public void takeScreenshot( Activity activity) {
-//        Date now = new Date();
-//        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
-//
-//        try {
-//            // image naming and path  to include sd card  appending name you choose for file
-//            String mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + ".jpg";
-//
-//            // create bitmap screen capture
-//            View v1 =  activity.getWindow().getDecorView().getRootView();
-//            v1.setDrawingCacheEnabled(true);
-//            Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
-//            v1.setDrawingCacheEnabled(false);
-//
-//            File imageFile = new File(mPath);
-//
-//            FileOutputStream outputStream = new FileOutputStream(imageFile);
-//            int quality = 100;
-//            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
-//            outputStream.flush();
-//            outputStream.close();
-//
-//            openScreenshot(imageFile);
-//        } catch (Throwable e) {
-//            // Several error may come out with file handling or DOM
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    private  Intent openScreenshot(File imageFile) {
-//        Intent intent = new Intent();
-//        intent.setAction(Intent.ACTION_VIEW);
-//        Uri uri = Uri.fromFile(imageFile);
-//        intent.setDataAndType(uri, "image/*");
-//        return intent;
-//    }
-//
-//
-//
-//    private final WindowManagerInternal mWindowManagerService;
-//    private final Context mContext;
-//    private Supplier<ScreenshotHelper> mScreenshotHelperSupplier;
-//
-//    private boolean takeScreenshot() {
-//        ScreenshotHelper screenshotHelper = (mScreenshotHelperSupplier != null)
-//                                            ? mScreenshotHelperSupplier.get() : new ScreenshotHelper(mContext);
-//        screenshotHelper.takeScreenshot(android.view.WindowManager.TAKE_SCREENSHOT_FULLSCREEN,
-//                                        true, true, SCREENSHOT_ACCESSIBILITY_ACTIONS,
-//                                        new Handler(Looper.getMainLooper()), null);
-//        return true;
-//    }
-//
-//
-//}
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.compose.ui.unit.Dp;
 import androidx.core.app.ActivityCompat;
 import com.livingtechusa.gotjokes.BaseApplication;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.Objects;
 
-import static android.graphics.Bitmap.Config.RGB_565;
-import static androidx.activity.result.ActivityResultCallerKt.registerForActivityResult;
-import static com.livingtechusa.gotjokes.util.EditPhotoKt.EditPhoto;
-import static com.livingtechusa.gotjokes.util.FindActivityKt.findActivity;
-
 public class TakeScreenShot {
 
-    public static Uri takeScreenShot(View view, String caption) {
+    public static Uri takeScreenShot(View view, String caption, Dp height, Dp width) {
         Integer length = caption.length() / 3;
         String fileName = caption.substring(0, length);
         fileName = fileName.replaceAll("\\s", "_");
         fileName = fileName.replace(".", "-");
         Date date = new Date();
         CharSequence formatedDate = DateFormat.format("yyyy-MM-dd_hh:mm:ss", date);
+        Integer fifth = ((int) height.getValue() / 5 );
 
-        view.setPadding(0, 300, 0, 775);
+        view.setPadding(0, fifth, 0, fifth);
         try {
             String dirPath = Environment.getExternalStorageDirectory().toString() + "/Got_Jokes";
             File fileDir = new File(dirPath);
@@ -170,15 +89,6 @@ public class TakeScreenShot {
         return null;
     }
 
-//    ActivityResultLauncher<String> mGetContent =
-//
-//    private Uri registerForActivityResult(new ActivityResultContracts.GetContent(),
-//    new ActivityResultCallback<Uri>() {
-//        @Override
-//        public void onActivityResult(Uri uri) {
-//            // Handle the returned Uri
-//        }
-//    });
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSION_STORAGE = {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,

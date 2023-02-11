@@ -15,7 +15,7 @@ private val dadJokeRetrofit = Retrofit.Builder()
 
 interface DadJokeApiService {
     @GET(ApiConstants.END_POINT_DADJOKES)
-    suspend fun getdadJoke(): DadJokes
+    suspend fun getdadJoke(): DadJokes?
 
     object DadJokeApi {
         val retrofitService: DadJokeApiService by lazy {

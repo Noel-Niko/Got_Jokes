@@ -23,7 +23,7 @@ import com.livingtechusa.gotjokes.ui.build.BuildViewModel
 
 @Composable
 fun MemeImgCard(uri: Uri) {
-    val buildViewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
+//    val buildViewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
     val configuration = LocalConfiguration.current
      val maxDimention: Dp =
         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
