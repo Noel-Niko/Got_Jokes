@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import com.livingtechusa.gotjokes.BaseApplication
+import com.livingtechusa.gotjokes.R
 import com.livingtechusa.gotjokes.data.api.ApiConstants.PEXEL_API_KEY
 import com.livingtechusa.gotjokes.data.api.model.Advice
 import com.livingtechusa.gotjokes.data.api.model.CatFact
@@ -145,7 +146,7 @@ class BuildViewModel @Inject constructor(
                     }
 
                     is ConvertToYodaSpeak -> {
-                        ConvertToTextToYodaSpeak(event.text)
+                        convertToTextToYodaSpeak(event.text)
                     }
 
                     is UpdateCaption -> {
@@ -280,7 +281,7 @@ class BuildViewModel @Inject constructor(
         if (_imageList.value.size > 10) {
             localService.removeOneImage((_imageUrl.value))
             _imageList.value = localService.getAllImages()
-            val rand = (0.._imageList.value.size - 1).shuffled().first()
+            val rand = (0 until _imageList.value.size).shuffled().first()
             val imageSearchEntity = imageList.value[rand]
             _imageUrl.value = imageSearchEntity.imageUrl
         } else {
@@ -291,8 +292,8 @@ class BuildViewModel @Inject constructor(
     private fun getImageList() {
         _loading = true
         getImages()
-        val rand = (0.._imageList.value.size - 1).shuffled().first()
-        val imageSearchEntity = imageList.value.get(rand)
+        val rand = (0 until _imageList.value.size).shuffled().first()
+        val imageSearchEntity = imageList.value[rand]
         _imageUrl.value = imageSearchEntity.imageUrl
         _loading = false
     }
@@ -315,14 +316,14 @@ class BuildViewModel @Inject constructor(
         }
     }
 
-    private fun ConvertToTextToYodaSpeak(text: String) {
+    private fun convertToTextToYodaSpeak(text: String) {
         viewModelScope.launch {
             try {
                 val result = YodaApiService.YodaSpeakApi.retrofitService.getYodaSpeak(text)
                 _caption.value = result?.contents?.translated ?: "Too many tries."
             } catch (e: Exception) {
                 Log.i("Yoda", e.message + " with cause " + e.cause)
-                _caption.value = "Sorry, Yoda only speaks 5 times an hour."
+                _caption.value = "Sorry Yoda only speaks 5 times an hour."
             }
             _loading = false
         }

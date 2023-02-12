@@ -8,7 +8,6 @@ import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class BaseApplication : Application() {
-
     companion object {
         private lateinit var sInstance: BaseApplication
 
@@ -20,12 +19,6 @@ class BaseApplication : Application() {
         super.onCreate()
         sInstance = this
         Stetho.initializeWithDefaults(this)
-//        Stetho.initialize(
-//            Stetho.newInitializerBuilder(this)
-//                .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
-//                .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
-//                .build()
-//        )
     }
 
     val isDark = mutableStateOf(false)

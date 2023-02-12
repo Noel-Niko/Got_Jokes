@@ -1,35 +1,12 @@
 package com.livingtechusa.gotjokes.util
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
 import android.graphics.Bitmap
-import android.provider.MediaStore
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.drawToBitmap
-
-//
-//val REQUEST_IMAGE_CAPTURE = 1
-//
-//private fun dispatchTakePictureIntent() {
-//    val getContent = registerForActivityResult(GetContent()) { uri: Uri? ->
-//        // Handle the returned Uri
-//    }
-//
-//
-//    val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//    try {
-//        registerForActivityResult()
-//
-//
-//        registerForActivityResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-//    } catch (e: ActivityNotFoundException) {
-//        // display error state to the user
-//    }
-//}
 
 
 @Composable

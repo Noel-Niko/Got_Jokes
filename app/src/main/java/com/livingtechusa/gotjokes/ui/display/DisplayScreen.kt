@@ -60,9 +60,6 @@ fun DisplayScreen() {
     val configuration = LocalConfiguration.current
     val height = configuration.screenHeightDp
     val width = configuration.screenWidthDp
-//    if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//        DisplayScreenLandscape()
-//    } else {
     val buildViewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
     val caption by buildViewModel.caption.collectAsState()
     val image by buildViewModel.imageUrl.collectAsState()
@@ -71,19 +68,14 @@ fun DisplayScreen() {
     val offSetY = remember { mutableStateOf(0f) }
 
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
-    // If `lifecycleOwner` changes, dispose and reset the effect
     DisposableEffect(lifecycleOwner) {
-        // Create an observer that triggers our remembered callbacks
-        // for sending analytics events
         val observer = LifecycleEventObserver { owner, event ->
             if (event == Lifecycle.Event.ON_DESTROY) {
                 buildViewModel.onTriggerEvent(BuildEvent.ResetColor)
             }
         }
-
         // Add the observer to the lifecycle
         lifecycleOwner.lifecycle.addObserver(observer)
-
         // When the effect leaves the Composition, remove the observer
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
@@ -140,7 +132,6 @@ fun DisplayScreen() {
             Text(
                 modifier = Modifier
                     .padding(55.dp, 0.dp, 55.dp, 0.dp)
-                    //.align(Alignment.CenterHorizontally)
                     .offset() {
                         IntOffset(
                             x = offSetX.value.roundToInt(),
@@ -153,13 +144,6 @@ fun DisplayScreen() {
                             onGesture = { centroid, pan, gestureZoom, gestureRotate ->
                                 val oldScale = zoom
                                 val newScale = (zoom.value * gestureZoom)
-
-                                // For natural zooming and rotating, the centroid of the gesture should
-                                // be the fixed point where zooming and rotating occurs.
-                                // We compute where the centroid was (in the pre-transformed coordinate
-                                // space), and then compute where it will be after this delta.
-                                // We then compute what the new offset should be to keep the centroid
-                                // visually stationary for rotating and zooming, and also apply the pan.
                                 offset.value =
                                     (offset.value + centroid / oldScale.value).rotateBy(
                                         gestureRotate
@@ -179,7 +163,6 @@ fun DisplayScreen() {
                         transformOrigin = TransformOrigin(0f, 0f)
                     }
                     .background(Color.Transparent)
-//                .fillMaxSize()
                     .clickable {
                         buildViewModel.onTriggerEvent(BuildEvent.UpdateColor)
                     }
@@ -223,30 +206,3 @@ fun DisplayScreen() {
         }
     }
 }
-
-//    var capturingViewBounds by remember { mutableStateOf<Rect?>(null) }
-//
-//    val context = LocalContext.current
-//    var view = LocalView.current
-//
-//    Column(
-//        modifier = Modifier
-//            .padding(top = 8.dp)
-//            .height(390.dp)
-//            .width(300.dp)
-//            .onGloballyPositioned {
-//                capturingViewBounds = it.boundsInRoot()
-//            },
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        val bounds = capturingViewBounds
-//        var bitmap = Bitmap.createBitmap(
-//            bounds?.width?.roundToInt()!!, bounds.height.roundToInt(),
-//            Bitmap.Config.ARGB_8888
-//        ).applyCanvas {
-//            translate(-bounds.left, -bounds.top)
-//            view.draw(this)
-//        }
-//
-//    }
-//}

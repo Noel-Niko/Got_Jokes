@@ -23,8 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.livingtechusa.gotjokes.ui.build.BuildEvent
 import com.livingtechusa.gotjokes.ui.build.BuildViewModel
 import com.livingtechusa.gotjokes.ui.components.JokesTabRow
@@ -47,13 +45,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun JokeApp() {
     val buildViewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
-
-//    val scaffoldState = rememberScaffoldState()
     JokesTheme() {
         val allScreens = JokesScreen.values().toList()
-        val navController = rememberNavController()
-//        val currentBackStack by navController.currentBackStackEntryAsState()
-//        val currentDestination = currentBackStack?.destination
         var currentScreen by rememberSaveable { mutableStateOf(JokesScreen.Build) }
         Scaffold(
             topBar = {
@@ -61,29 +54,30 @@ fun JokeApp() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start,
                 ) {
-                    Column(modifier = Modifier.fillMaxWidth(0.2f)
-                        .align(Alignment.CenterVertically)
-                        //.background(color = MaterialTheme.colors.primaryVariant)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(0.2f)
+                            .align(Alignment.CenterVertically)
                     ) {
                         IconButton(
                             modifier = Modifier
                                 .wrapContentWidth(align = Alignment.Start),
-                                //.background(color = MaterialTheme.colors.primaryVariant),
                             onClick = {
                                 buildViewModel.onTriggerEvent(BuildEvent.GetNewImage)
                             }) {
                             Icon(Icons.Filled.Refresh, "Refresh")
                         }
                     }
-                    Column(modifier = Modifier.fillMaxWidth()
-                        .align(Alignment.CenterVertically)
-                        //.background(color = MaterialTheme.colors.primaryVariant)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterVertically)
                     ) {
-                            JokesTabRow(
-                                allScreens = allScreens,
-                                onTabSelected = { screen -> currentScreen = screen },
-                                currentScreen = currentScreen
-                            )
+                        JokesTabRow(
+                            allScreens = allScreens,
+                            onTabSelected = { screen -> currentScreen = screen },
+                            currentScreen = currentScreen
+                        )
                     }
                 }
             }
@@ -98,66 +92,3 @@ fun JokeApp() {
         }
     }
 }
-
-//        JokesTheme() {
-//        val navController = rememberNavController()
-//        val currentBackStack by navController.currentBackStackEntryAsState()
-//        val currentDestination = currentBackStack?.destination
-//        val currentScreen =
-//            jokeTabRowScreens.find { it.route == currentDestination?.route } ?: Build
-//
-//        Surface(
-//            modifier = Modifier.fillMaxSize(),
-//            color = MaterialTheme.colors.background
-//        ) {
-//    modifier = Modifier
-//        .fillMaxWidth()
-//        .wrapContentWidth(Alignment.End),
-//    navigationIcon = {
-//        IconButton(
-//            modifier = Modifier.wrapContentWidth(align = Alignment.Start),
-//            onClick = {
-//                buildViewModel.onTriggerEvent(BuildEvent.GetNewImage)
-//            }) {
-//            Icon(Icons.Filled.Refresh, "Refresh")
-//        }
-//        IconButton(
-//            modifier = Modifier.wrapContentWidth(align = Alignment.End),
-//            onClick = {
-//                buildViewModel.onTriggerEvent(BuildEvent.GoToDisplayScreen(navController))
-//            }) {
-//            Icon(Icons.Default.Build, "Build") //painter = painterResource(id = R.drawable.ic_save_24px),
-//        }
-//        IconButton(
-//            modifier = Modifier.wrapContentWidth(align = Alignment.End),
-//            onClick = {
-//                buildViewModel.onTriggerEvent(BuildEvent.Save(navController, buildViewModel.imageUrl.value.toString(), buildViewModel.caption.value))
-//            }) {
-//            Icon(Icons.Default.Save, "Save") //painter = painterResource(id = R.drawable.ic_save_24px),
-//        }
-//        IconButton(
-//            modifier = Modifier.wrapContentWidth(align = Alignment.End),
-//            onClick = {
-//                buildViewModel.onTriggerEvent(BuildEvent.GoToDisplayScreen(navController))
-//            }) {
-//            Icon(Icons.Default.Image, "Memes") //painter = painterResource(id = R.drawable.ic_save_24px),
-//        }
-//    },
-//    title = {
-//        Text(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .wrapContentWidth(align = Alignment.CenterHorizontally),
-//            text = "Got Jokes?"
-//        )
-//    },
-//    backgroundColor = MaterialTheme.colors.primary,
-//    contentColor = Color.White,
-//    elevation = 10.dp
-//
-//    )
-//}
-
-
-
-

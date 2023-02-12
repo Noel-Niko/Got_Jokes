@@ -80,7 +80,7 @@ fun BuildScreenLandscape() {
                         }
                         Column(
                             modifier = Modifier.verticalScroll(scrollState)
-                        ){
+                        ) {
                             TextField(
                                 modifier = Modifier.fillMaxWidth(),
                                 value = caption,
@@ -94,7 +94,11 @@ fun BuildScreenLandscape() {
                                     .wrapContentWidth(),
                                 text = AnnotatedString("Convert Caption to Yoda Speak"),
                                 onClick = {
-                                    buildViewModel.onTriggerEvent(BuildEvent.ConvertToYodaSpeak(caption))
+                                    buildViewModel.onTriggerEvent(
+                                        BuildEvent.ConvertToYodaSpeak(
+                                            caption
+                                        )
+                                    )
                                 }
                             )
                             Spacer(modifier = Modifier.width(16.dp))
@@ -106,29 +110,47 @@ fun BuildScreenLandscape() {
                             Spacer(modifier = Modifier.width(16.dp))
                             ClickableText(
                                 modifier = Modifier.wrapContentWidth(),
-                                text = AnnotatedString(yoMamma.joke ?: "YoMamma is unavaliable now."),
+                                text = AnnotatedString(
+                                    yoMamma.joke ?: "YoMamma is unavaliable now."
+                                ),
                                 onClick = {
                                     buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(yoMamma.joke.toString()))
                                 }
                             )
                             // Dad Joke
                             Spacer(modifier = Modifier.width(16.dp))
-                            val dadjoke = if (!dadJoke.attachments.isEmpty()) dadJoke.attachments.get(0).text else null
+                            val dadjoke =
+                                if (!dadJoke.attachments.isEmpty()) dadJoke.attachments.get(0).text else null
                             ClickableText(
                                 modifier = Modifier.wrapContentWidth(),
-                                text = AnnotatedString(dadjoke ?: "Don't tell your momma, but Dad's off line now.."),
+                                text = AnnotatedString(
+                                    dadjoke ?: "Don't tell your momma, but Dad's off line now.."
+                                ),
                                 onClick = {
-                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(dadJoke.attachments.get(0).text))
+                                    buildViewModel.onTriggerEvent(
+                                        BuildEvent.UpdateCaption(
+                                            dadJoke.attachments.get(
+                                                0
+                                            ).text
+                                        )
+                                    )
                                 }
                             )
                             // Joke
                             Spacer(modifier = Modifier.width(16.dp))
-                            val jokeApiJokeValue = if (jokeApiJoke.joke.isEmpty().not()) jokeApiJoke.joke else null
+                            val jokeApiJokeValue =
+                                if (jokeApiJoke.joke.isEmpty().not()) jokeApiJoke.joke else null
                             ClickableText(
                                 modifier = Modifier.wrapContentWidth(),
-                                text = AnnotatedString(jokeApiJokeValue ?: "Nuttin here ta laugh about!'"),
+                                text = AnnotatedString(
+                                    jokeApiJokeValue ?: "Nuttin here ta laugh about!'"
+                                ),
                                 onClick = {
-                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(jokeApiJokeValue.toString()))
+                                    buildViewModel.onTriggerEvent(
+                                        BuildEvent.UpdateCaption(
+                                            jokeApiJokeValue.toString()
+                                        )
+                                    )
                                 }
                             )
                             Spacer(modifier = Modifier.width(16.dp))
@@ -138,12 +160,19 @@ fun BuildScreenLandscape() {
                             )
                             // Advice
                             Spacer(modifier = Modifier.width(16.dp))
-                            val adviceString: String? = if (advice.slip.advice.isEmpty().not()) advice.slip.advice else null
+                            val adviceString: String? =
+                                if (advice.slip.advice.isEmpty().not()) advice.slip.advice else null
                             ClickableText(
                                 modifier = Modifier.wrapContentWidth(),
-                                text = AnnotatedString(adviceString ?: "No advice is sometimes the best."),
+                                text = AnnotatedString(
+                                    adviceString ?: "No advice is sometimes the best."
+                                ),
                                 onClick = {
-                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(adviceString ?: "No advice is sometimes the best."))
+                                    buildViewModel.onTriggerEvent(
+                                        BuildEvent.UpdateCaption(
+                                            adviceString ?: "No advice is sometimes the best."
+                                        )
+                                    )
                                 }
                             )
                             Spacer(modifier = Modifier.width(16.dp))
@@ -157,7 +186,11 @@ fun BuildScreenLandscape() {
                                 modifier = Modifier.wrapContentWidth(),
                                 text = AnnotatedString(randomFact.text ?: "Nuttin ta see here."),
                                 onClick = {
-                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(randomFact.text))
+                                    buildViewModel.onTriggerEvent(
+                                        BuildEvent.UpdateCaption(
+                                            randomFact.text
+                                        )
+                                    )
                                 }
                             )
                             // Cat Fact

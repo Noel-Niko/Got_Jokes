@@ -5,27 +5,23 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
-import com.livingtechusa.gotjokes.ui.build.BuildViewModel
 
 @Composable
 fun MemeImgCard(uri: Uri) {
-//    val buildViewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
     val configuration = LocalConfiguration.current
-     val maxDimention: Dp =
+    val maxDimention: Dp =
         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             configuration.screenHeightDp.dp
         } else {

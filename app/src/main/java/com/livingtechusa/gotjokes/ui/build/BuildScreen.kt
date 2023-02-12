@@ -21,11 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.livingtechusa.gotjokes.R
@@ -55,7 +51,6 @@ fun BuildScreen() {
                 .fillMaxSize()
 
         ) {
-            // TODO: animate the progress icon to be 3 dots moving
             if (image == null && yoMamma.joke == null) {
                 item {
                     Column(
@@ -90,7 +85,8 @@ fun BuildScreen() {
                         ClickableText(
                             modifier = Modifier.fillMaxWidth(),
                             text = AnnotatedString(
-                                text = stringResource(R.string.convert_caption_to_yoda_speak)),
+                                text = stringResource(R.string.convert_caption_to_yoda_speak)
+                            ),
                             onClick = {
                                 buildViewModel.onTriggerEvent(BuildEvent.ConvertToYodaSpeak(caption))
                             }
@@ -111,22 +107,38 @@ fun BuildScreen() {
                         )
                         // Dad Joke
                         Spacer(modifier = Modifier.height(16.dp))
-                        val dadjoke = if (!dadJoke.attachments.isEmpty()) dadJoke.attachments.get(0).text else null
+                        val dadjoke =
+                            if (!dadJoke.attachments.isEmpty()) dadJoke.attachments.get(0).text else null
                         ClickableText(
                             modifier = Modifier.fillMaxWidth(),
-                            text = AnnotatedString(dadjoke ?: "Don't tell your momma, but Dad's off line now.."),
+                            text = AnnotatedString(
+                                dadjoke ?: "Don't tell your momma, but Dad's off line now.."
+                            ),
                             onClick = {
-                                buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(dadJoke.attachments.get(0).text))
+                                buildViewModel.onTriggerEvent(
+                                    BuildEvent.UpdateCaption(
+                                        dadJoke.attachments.get(
+                                            0
+                                        ).text
+                                    )
+                                )
                             }
                         )
                         // Joke
                         Spacer(modifier = Modifier.height(16.dp))
-                        val jokeApiJokeValue = if (jokeApiJoke.joke.isEmpty().not()) jokeApiJoke.joke else null
+                        val jokeApiJokeValue =
+                            if (jokeApiJoke.joke.isEmpty().not()) jokeApiJoke.joke else null
                         ClickableText(
                             modifier = Modifier.fillMaxWidth(),
-                            text = AnnotatedString(jokeApiJokeValue ?: "Nuttin here ta laugh about!'"),
+                            text = AnnotatedString(
+                                jokeApiJokeValue ?: "Nuttin here ta laugh about!'"
+                            ),
                             onClick = {
-                                buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(jokeApiJokeValue.toString()))
+                                buildViewModel.onTriggerEvent(
+                                    BuildEvent.UpdateCaption(
+                                        jokeApiJokeValue.toString()
+                                    )
+                                )
                             }
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -136,12 +148,19 @@ fun BuildScreen() {
                         )
                         // Advice
                         Spacer(modifier = Modifier.height(16.dp))
-                        val adviceString: String? = if (advice.slip.advice.isEmpty().not()) advice.slip.advice else null
+                        val adviceString: String? =
+                            if (advice.slip.advice.isEmpty().not()) advice.slip.advice else null
                         ClickableText(
                             modifier = Modifier.fillMaxWidth(),
-                            text = AnnotatedString(adviceString ?: "No advice is sometimes the best."),
+                            text = AnnotatedString(
+                                adviceString ?: "No advice is sometimes the best."
+                            ),
                             onClick = {
-                                buildViewModel.onTriggerEvent(BuildEvent.UpdateCaption(adviceString ?: "No advice is sometimes the best."))
+                                buildViewModel.onTriggerEvent(
+                                    BuildEvent.UpdateCaption(
+                                        adviceString ?: "No advice is sometimes the best."
+                                    )
+                                )
                             }
                         )
                         Spacer(modifier = Modifier.height(16.dp))

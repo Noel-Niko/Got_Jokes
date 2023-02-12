@@ -15,8 +15,10 @@ import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
 import androidx.compose.ui.unit.Dp;
 import androidx.core.app.ActivityCompat;
+
 import com.livingtechusa.gotjokes.BaseApplication;
 
 import java.io.File;
@@ -34,10 +36,10 @@ public class TakeScreenShot {
         fileName = fileName.replace(".", "-");
         Date date = new Date();
         CharSequence formatedDate = DateFormat.format("yyyy-MM-dd_hh:mm:ss", date);
-        Integer top = ((int) height.getValue() / 5 );
+        Integer top = ((int) height.getValue() / 5);
         double bottom = (top * 1.5);
 
-        view.setPadding(0, top, 0, (int)bottom);
+        view.setPadding(0, top, 0, (int) bottom);
         try {
             String dirPath = Environment.getExternalStorageDirectory().toString() + "/Got_Jokes";
             File fileDir = new File(dirPath);
@@ -52,10 +54,10 @@ public class TakeScreenShot {
                     view.getDrawingCache()
             );
             view.setDrawingCacheEnabled(false);
-            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
                 String filePath = fileName + "-" + formatedDate;
                 Uri imageUri = saveImage(bitmap, filePath);
-                view.setPadding(0,0,0,0);
+                view.setPadding(0, 0, 0, 0);
                 return imageUri;
             }
             File imageFile = new File(path);
@@ -65,7 +67,7 @@ public class TakeScreenShot {
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
             fileOutputStream.flush();
             fileOutputStream.close();
-            view.setPadding(0,0,0,0);
+            view.setPadding(0, 0, 0, 0);
             return Uri.fromFile(BaseApplication.getInstance().getFileStreamPath(imageFile.getName()));
 
         } catch (Exception e) {
@@ -81,10 +83,10 @@ public class TakeScreenShot {
             Manifest.permission.READ_EXTERNAL_STORAGE
     };
 
-    public static void verifyStoragePermission(Activity activity){
+    public static void verifyStoragePermission(Activity activity) {
         int permissionWrite = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int permissionRead = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
-        if(permissionWrite != PackageManager.PERMISSION_GRANTED || permissionRead != PackageManager.PERMISSION_GRANTED ) {
+        if (permissionWrite != PackageManager.PERMISSION_GRANTED || permissionRead != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
                     activity,
                     PERMISSION_STORAGE,
@@ -97,7 +99,7 @@ public class TakeScreenShot {
         String TAG = "ScreenShot";
         OutputStream fos;
         try {
-            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
                 ContentResolver resolver = BaseApplication.getInstance().getContentResolver();
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName + ".jpg");
@@ -106,13 +108,11 @@ public class TakeScreenShot {
                 fos = resolver.openOutputStream(Objects.requireNonNull(imageUri));
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
                 Objects.requireNonNull(fos);
-            return imageUri;
+                return imageUri;
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             Log.e(TAG, "Error: " + e.getMessage() + " with cause " + e.getCause());
         }
         return null;
     }
-
-
 }
