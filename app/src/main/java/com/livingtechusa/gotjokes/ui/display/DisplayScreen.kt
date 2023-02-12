@@ -9,7 +9,6 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -47,7 +45,6 @@ import com.livingtechusa.gotjokes.R
 import com.livingtechusa.gotjokes.ui.build.BuildEvent
 import com.livingtechusa.gotjokes.ui.build.BuildViewModel
 import com.livingtechusa.gotjokes.ui.components.DisplayImgCard
-import com.livingtechusa.gotjokes.ui.components.animation_utils.MultiTouchBox
 import com.livingtechusa.gotjokes.util.TakeScreenShot
 import com.livingtechusa.gotjokes.util.findActivity
 import kotlin.math.roundToInt
@@ -104,43 +101,11 @@ fun DisplayScreen() {
         )
     }
 
-    var offset = remember { mutableStateOf(Offset.Zero) }
-    var zoom = remember { mutableStateOf(1f) }
-    var angle = remember { mutableStateOf(0f) }
+    val offset = remember { mutableStateOf(Offset.Zero) }
+    val zoom = remember { mutableStateOf(1f) }
+    val angle = remember { mutableStateOf(0f) }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-
-        Button(
-           // modifier = Modifier.align(Alignment.CenterHorizontally),
-            onClick = {
-                try {
-
-                    val imageUri = TakeScreenShot.takeScreenShot(
-                        activity.window.decorView,
-                        caption,
-                        (height * 2).dp,
-                        width.dp
-                    )
-                    val uri: Uri = imageUri
-
-                    buildViewModel.onTriggerEvent(BuildEvent.Save(uri))
-                    Toast.makeText(activity, "Saved", Toast.LENGTH_SHORT).show()
-                } catch (e: Exception) {
-                    val TAG = "ScreenShot"
-                    Log.e(
-                        TAG,
-                        "Error message: " + e.message + " with cause " + e.cause
-                    )
-                    Toast.makeText(
-                        activity,
-                        "Unable to save. \n Error: " + e.cause,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        ) {
-            Text(stringResource(R.string.save))
-        }
         Column(
             modifier = Modifier
                 .fillMaxHeight((height / 5) * 3.5f)
@@ -223,6 +188,38 @@ fun DisplayScreen() {
                 fontSize = fontSize.value.sp,
                 color = textColor
             )
+        }
+
+        Button(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            onClick = {
+                try {
+
+                    val imageUri = TakeScreenShot.takeScreenShot(
+                        activity.window.decorView,
+                        caption,
+                        (height * 2).dp,
+                        width.dp
+                    )
+                    val uri: Uri = imageUri
+
+                    buildViewModel.onTriggerEvent(BuildEvent.Save(uri))
+                    Toast.makeText(activity, "Saved", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    val TAG = "ScreenShot"
+                    Log.e(
+                        TAG,
+                        "Error message: " + e.message + " with cause " + e.cause
+                    )
+                    Toast.makeText(
+                        activity,
+                        "Unable to save. \n Error: " + e.cause,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        ) {
+            Text(stringResource(R.string.save))
         }
     }
 }
