@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.livingtechusa.gotjokes.R
 import com.livingtechusa.gotjokes.ui.build.BuildEvent
@@ -42,6 +42,21 @@ import com.livingtechusa.gotjokes.ui.components.DisplayImgCard
 import com.livingtechusa.gotjokes.util.TakeScreenShot
 import com.livingtechusa.gotjokes.util.findActivity
 import kotlin.math.roundToInt
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import com.livingtechusa.gotjokes.ui.components.animation_utils.MultiTouchBox
+import java.lang.Math.PI
+import java.lang.Math.cos
+import java.lang.Math.sin
 
 @Composable
 fun DisplayScreen() {
@@ -84,94 +99,97 @@ fun DisplayScreen() {
         }
     }
     val fontSize = remember {
-        mutableStateOf((height * .25).toInt() )
+        mutableStateOf((height * .025).toInt())
     }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        if (image == null) {
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(25.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-        } else {
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp)
-                ) {
-                    Spacer(
-                        Modifier.height((height / 5).dp)
-                    )
-                    if (image != null) {
-                        DisplayImgCard(url = image!!)
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
+    Column(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            if (image == null) {
+                item {
+                    Column(
                         modifier = Modifier
-                            .padding(28.dp, 0.dp, 28.dp, 0.dp)
-                            .align(Alignment.CenterHorizontally)
-                            .offset() {
-                                IntOffset(
-                                    x = offSetX.value.roundToInt(),
-                                    y = offSetY.value.roundToInt()
-                                )
-                            }
-                            .pointerInput(Unit) {
-                                detectDragGestures { change, dragAmount ->
-                                    change.consumeAllChanges()
-                                    offSetX.value += dragAmount.x
-                                    offSetY.value += dragAmount.y
+                            .fillMaxSize()
+                            .padding(25.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            } else {
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp)
+                    ) {
+
+                        Spacer(
+                            Modifier.height((height / 5).dp)
+                        )
+                        if (image != null) {
+                            DisplayImgCard(url = image!!)
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            modifier = Modifier
+                                .padding(55.dp, 0.dp, 55.dp, 0.dp)
+                                .align(Alignment.CenterHorizontally)
+                                .offset() {
+                                    IntOffset(
+                                        x = offSetX.value.roundToInt(),
+                                        y = offSetY.value.roundToInt()
+                                    )
+                                }
+                                .pointerInput(Unit) {
+                                    detectDragGestures { change, dragAmount ->
+                                        change.consumeAllChanges()
+                                        offSetX.value += dragAmount.x
+                                        offSetY.value += dragAmount.y
+                                    }
+                                }
+                                .clickable {
+                                    buildViewModel.onTriggerEvent(BuildEvent.UpdateColor)
+                                },
+                            text = caption,
+                            fontSize = fontSize.value.sp,
+                            color = textColor
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Button(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            onClick = {
+                                try {
+
+                                    val imageUri = TakeScreenShot.takeScreenShot(
+                                        activity.window.decorView,
+                                        caption,
+                                        (height * 2).dp,
+                                        width.dp
+                                    )
+                                    val uri: Uri = imageUri
+
+                                    buildViewModel.onTriggerEvent(BuildEvent.Save(uri))
+                                    Toast.makeText(activity, "Saved", Toast.LENGTH_SHORT).show()
+                                } catch (e: Exception) {
+                                    val TAG = "ScreenShot"
+                                    Log.e(
+                                        TAG,
+                                        "Error message: " + e.message + " with cause " + e.cause
+                                    )
+                                    Toast.makeText(
+                                        activity,
+                                        "Unable to save. \n Error: " + e.cause,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             }
-                            .clickable {
-                                buildViewModel.onTriggerEvent(BuildEvent.UpdateColor)
-                            },
-                        text = caption,
-                        fontSize = fontSize.value.sp,
-                        color = textColor
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Button(
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        onClick = {
-                            try {
-
-                                val imageUri = TakeScreenShot.takeScreenShot(
-                                    activity.window.decorView,
-                                    caption,
-                                    (height * 2).dp,
-                                    width.dp
-                                )
-                                val uri: Uri = imageUri
-
-                                buildViewModel.onTriggerEvent(BuildEvent.Save(uri))
-                                Toast.makeText(activity, "Saved", Toast.LENGTH_SHORT).show()
-                            } catch (e: Exception) {
-                                val TAG = "ScreenShot"
-                                Log.e(
-                                    TAG,
-                                    "Error message: " + e.message + " with cause " + e.cause
-                                )
-                                Toast.makeText(
-                                    activity,
-                                    "Unable to save. \n Error: " + e.cause,
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
+                        ) {
+                            Text(stringResource(R.string.save))
                         }
-                    ) {
-                        Text(stringResource(R.string.save))
                     }
                 }
             }

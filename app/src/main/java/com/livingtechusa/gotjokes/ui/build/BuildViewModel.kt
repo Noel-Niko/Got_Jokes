@@ -37,6 +37,7 @@ import com.livingtechusa.gotjokes.network.RandomFactsApiService
 import com.livingtechusa.gotjokes.network.YoMammaApi
 import com.livingtechusa.gotjokes.network.YodaApiService
 import com.livingtechusa.gotjokes.ui.build.BuildEvent.*
+import com.livingtechusa.gotjokes.util.Constants.EMPTY_STRING
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -113,14 +114,6 @@ class BuildViewModel @Inject constructor(
         getDadJoke()
         getCatFact()
         getDogFact()
-        //        if (state.get<String>(STATE_KEY_URL) == "com.livingtechusa.gotjokes.ui.build.joke.url") {
-        //            state.get<String>(STATE_KEY_URL)?.let { imgFlipUrl ->
-        //                joke.image = imgFlipUrl
-        //            } ?: onTriggerEvent(GetImages)
-        //        } else {
-        //            onTriggerEvent(GetImages)
-        //        }
-
     }
 
     fun onTriggerEvent(event: BuildEvent) {
@@ -128,7 +121,7 @@ class BuildViewModel @Inject constructor(
             try {
                 when (event) {
                     is GetImages -> {
-                        _caption.value = ""
+                        _caption.value = EMPTY_STRING
                         getImageList()
                         getYoMammaJokes()
                         getRandomFacts()
@@ -140,7 +133,7 @@ class BuildViewModel @Inject constructor(
                     }
 
                     is GetNewImage -> {
-                        _caption.value = ""
+                        _caption.value = EMPTY_STRING
                         getImage()
                         getYoMammaJokes()
                         getRandomFacts()
