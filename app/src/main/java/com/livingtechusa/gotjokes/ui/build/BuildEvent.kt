@@ -12,23 +12,19 @@ sealed class BuildEvent {
     data class ConvertToYodaSpeak(
         val text: String
     ) : BuildEvent()
-
     data class UpdateCaption(
         val text: String
     ) : BuildEvent()
-
     data class Save(
         var imgURI: Uri
     ) : BuildEvent()
-
     data class Delete(
         val joke: JokeEntity
         ) : BuildEvent()
-
     object UpdateColor : BuildEvent()
-
     object ResetColor : BuildEvent()
     data class Share(
         val joke: JokeEntity
     ) : BuildEvent()
+    object SwitchFont : BuildEvent()
 }

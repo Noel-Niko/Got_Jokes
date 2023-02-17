@@ -53,6 +53,7 @@ fun defaultDynamicTheme(
 
         else -> LightColorScheme
     }
+    val typography = Typography
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -61,10 +62,9 @@ fun defaultDynamicTheme(
         }
     }
 
-
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = androidx.compose.material3.Typography(),
+        typography = typography,
         content = content
     )
 }

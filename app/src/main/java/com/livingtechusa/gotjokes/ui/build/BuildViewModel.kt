@@ -155,25 +155,6 @@ class BuildViewModel @Inject constructor(
 
                     is Save -> {
                         val imageUri = event.imgURI
-//                        val openDocument = rememberLauncherForActivityResult(
-//                            contract = ActivityResultContracts.OpenDocument(),
-//                        ) { uri ->
-//                            uri?.let {
-//                                    imageUri = it
-//                            }
-//                         }
-//    val getPictureIntent = Intent(MediaStore.ACTION_REVIEW)
-//    try {
-//        startActivityForResult(MainActivity(), getPictureIntent, 0, null)
-//    } catch (e: ActivityNotFoundException) {
-//        // display error state to the user
-//    }
-//                        val shareIntent: Intent = Intent().apply {
-//                            action = Intent.ACTION_SEND
-//                            putExtra(Intent.EXTRA_STREAM, imageUri)
-//                            type = "image/jpeg"
-//                        }
-//                      BaseApplication.getInstance().applicationContext.startActivity(Intent.createChooser(shareIntent, null), null)
                         val joke = JokeEntity(
                             imageUrl = imageUrl.value.toString(),
                             caption = caption.value,
@@ -222,6 +203,8 @@ class BuildViewModel @Inject constructor(
                     is ResetColor -> {
                         _color.value = Color.Black
                     }
+
+                    else -> {}
                 }
 
             } catch (e: Exception) {
@@ -323,7 +306,7 @@ class BuildViewModel @Inject constructor(
                 _caption.value = result?.contents?.translated ?: "Too many tries."
             } catch (e: Exception) {
                 Log.i("Yoda", e.message + " with cause " + e.cause)
-                _caption.value = "Sorry Yoda only speaks 5 times an hour."
+                _caption.value = context.getString(R.string.sorry_yoda_only_speaks_5_times_an_hour)
             }
             _loading = false
         }
@@ -418,21 +401,4 @@ class BuildViewModel @Inject constructor(
             _loading = false
         }
     }
-
-    private val _screenshot = MutableLiveData<Bitmap>()
-    val screenshot: LiveData<Bitmap> = _screenshot
-
-    fun copyViewScreenshotIntoBitmap(view: View, window: Window) {
-//        PixelCopyHelper.getViewBitmap(view, window, object : PixelCopyHelper.PixelCopyListener {
-//            override fun onCopySuccess(bitmap: Bitmap) {
-//                _screenshot.postValue(bitmap)
-//            }
-//
-//            override fun onCopyError() {
-//                // Handle error case
-//            }
-//        })
-    }
-
-
 }

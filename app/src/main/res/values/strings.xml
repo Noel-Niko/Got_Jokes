@@ -8,4 +8,15 @@
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
     <string name="convert_caption_to_yoda_speak">Convert Caption to Yoda Speak</string>
+    <string name="bad_jokes">Bad jokes...</string>
+    <string name="all_out_of_dog_gone_info">All out of dog gone info.</string>
+    <string name="all_out_of_cat_facts">All out of cat facts.</string>
+    <string name="nuttin_ta_see_here">Nuttin ta see here.</string>
+    <string name="no_advice_is_sometimes_the_best">No advice is sometimes the best.</string>
+    <string name="good_advice">Good advice...</string>
+    <string name="nuttin_here_ta_laugh_about">Nuttin here ta laugh about!\'</string>
+    <string name="don_t_tell_your_momma_but_dad_s_off_line_now">Don\'t tell your momma, but Dad\'s off line now..</string>
+    <string name="yomamma_is_unavailable_now">YoMamma is unavailable now.</string>
+    <string name="change_font">Change Font</string>
+    <string name="sorry_yoda_only_speaks_5_times_an_hour">Sorry Yoda only speaks 5 times an hour.</string>
 </resources>
