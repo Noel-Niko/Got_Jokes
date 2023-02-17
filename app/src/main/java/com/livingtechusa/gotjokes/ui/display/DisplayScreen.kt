@@ -60,18 +60,18 @@ fun DisplayScreen() {
     val configuration = LocalConfiguration.current
     val height = configuration.screenHeightDp
     val width = configuration.screenWidthDp
-    val buildViewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
-    val caption by buildViewModel.caption.collectAsState()
-    val image by buildViewModel.imageUrl.collectAsState()
-    val textColor by buildViewModel.color.collectAsState()
+    val viewModel: BuildViewModel = viewModel(BuildViewModel::class.java)
+    val caption by viewModel.caption.collectAsState()
+    val image by viewModel.imageUrl.collectAsState()
+    val textColor by viewModel.color.collectAsState()
     val offSetX = remember { mutableStateOf(0f) }
     val offSetY = remember { mutableStateOf(0f) }
 
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { owner, event ->
-            if (event == Lifecycle.Event.ON_DESTROY) {
-                buildViewModel.onTriggerEvent(BuildEvent.ResetColor)
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.onTriggerEvent(BuildEvent.ResetColor)
             }
         }
         // Add the observer to the lifecycle
@@ -128,7 +128,9 @@ fun DisplayScreen() {
                 }
             }
         }
-        Box() {
+        Box(modifier = Modifier
+            .background(Color.Transparent)
+        ) {
             Text(
                 modifier = Modifier
                     .padding(55.dp, 0.dp, 55.dp, 0.dp)
@@ -164,7 +166,7 @@ fun DisplayScreen() {
                     }
                     .background(Color.Transparent)
                     .clickable {
-                        buildViewModel.onTriggerEvent(BuildEvent.UpdateColor)
+                        viewModel.onTriggerEvent(BuildEvent.UpdateColor)
                     }
                     .fillMaxSize(),
                 text = caption,
@@ -186,7 +188,7 @@ fun DisplayScreen() {
                     )
                     val uri: Uri = imageUri
 
-                    buildViewModel.onTriggerEvent(BuildEvent.Save(uri))
+                    viewModel.onTriggerEvent(BuildEvent.Save(uri))
                     Toast.makeText(activity, "Saved", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
                     val TAG = "ScreenShot"
