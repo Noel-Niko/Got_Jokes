@@ -14,7 +14,7 @@ private val jokeRetrofit = Retrofit.Builder()
 
 interface JokeApiService {
     @GET(END_POINT_JOKE_API)
-    suspend fun getJokeApiJoke(): com.livingtechusa.gotjokes.data.api.model.JokeApi
+    suspend fun getJokeApiJoke(): com.livingtechusa.gotjokes.data.api.model.JokeApi?
 
     object JokeApi {
         val retrofitService: JokeApiService by lazy {

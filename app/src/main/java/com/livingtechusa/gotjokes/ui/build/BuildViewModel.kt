@@ -1,9 +1,18 @@
 package com.livingtechusa.gotjokes.ui.build
 
+import android.content.ContentResolver
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
 import android.util.Log
+import android.view.View
+import android.view.Window
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
+import com.livingtechusa.gotjokes.BaseApplication
+import com.livingtechusa.gotjokes.R
 import com.livingtechusa.gotjokes.data.api.ApiConstants.PEXEL_API_KEY
 import com.livingtechusa.gotjokes.data.api.model.Advice
 import com.livingtechusa.gotjokes.data.api.model.CatFact
@@ -29,13 +38,14 @@ import com.livingtechusa.gotjokes.network.RandomFactsApiService
 import com.livingtechusa.gotjokes.network.YoMammaApi
 import com.livingtechusa.gotjokes.network.YodaApiService
 import com.livingtechusa.gotjokes.ui.build.BuildEvent.*
+import com.livingtechusa.gotjokes.util.Constants.EMPTY_STRING
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDateTime
-import java.util.Date
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.util.Date
+import javax.inject.Inject
 
 const val STATE_KEY_URL = "com.livingtechusa.gotjokes.ui.build.joke.url"
 
@@ -49,6 +59,8 @@ class BuildViewModel @Inject constructor(
     //    private val _status = MutableStateFlow(ApiStatus.PRE_INIT)
     //    val status: StateFlow<ApiStatus>
     //        get() = _status
+    private val context: Context
+        get() = BaseApplication.getInstance()
 
     private val _imageList = MutableStateFlow(emptyList<ImageSearchEntity>())
     val imageList: StateFlow<List<ImageSearchEntity>> get() = _imageList
@@ -62,7 +74,7 @@ class BuildViewModel @Inject constructor(
     private val _yodaSpeak = MutableStateFlow(String())
     val yodaSpeak: StateFlow<String> get() = _yodaSpeak
 
-    private val _yoMamma = MutableStateFlow(YoMamma(null))
+    private val _yoMamma = MutableStateFlow(YoMamma(""))
     val yoMamma: StateFlow<YoMamma> get() = _yoMamma
 
     private val _randomFact = MutableStateFlow(RandomFact())
@@ -94,6 +106,7 @@ class BuildViewModel @Inject constructor(
 
     init {
         _loading = true
+        _color.value = Color.Black
         getImages()
         getYoMammaJokes()
         getRandomFacts()
@@ -102,24 +115,14 @@ class BuildViewModel @Inject constructor(
         getDadJoke()
         getCatFact()
         getDogFact()
-
-        //        if (state.get<String>(STATE_KEY_URL) == "com.livingtechusa.gotjokes.ui.build.joke.url") {
-        //            state.get<String>(STATE_KEY_URL)?.let { imgFlipUrl ->
-        //                joke.image = imgFlipUrl
-        //            } ?: onTriggerEvent(GetImages)
-        //        } else {
-        //            onTriggerEvent(GetImages)
-        //        }
-
     }
-
 
     fun onTriggerEvent(event: BuildEvent) {
         viewModelScope.launch {
             try {
                 when (event) {
                     is GetImages -> {
-                        _caption.value = ""
+                        _caption.value = EMPTY_STRING
                         getImageList()
                         getYoMammaJokes()
                         getRandomFacts()
@@ -129,8 +132,9 @@ class BuildViewModel @Inject constructor(
                         getCatFact()
                         getDogFact()
                     }
+
                     is GetNewImage -> {
-                        _caption.value = ""
+                        _caption.value = EMPTY_STRING
                         getImage()
                         getYoMammaJokes()
                         getRandomFacts()
@@ -140,25 +144,51 @@ class BuildViewModel @Inject constructor(
                         getCatFact()
                         getDogFact()
                     }
+
                     is ConvertToYodaSpeak -> {
-                        ConvertToTextToYodaSpeak(event.text)
+                        convertToTextToYodaSpeak(event.text)
                     }
+
                     is UpdateCaption -> {
                         _caption.value = event.text
                     }
+
                     is Save -> {
+                        val imageUri = event.imgURI
                         val joke = JokeEntity(
                             imageUrl = imageUrl.value.toString(),
                             caption = caption.value,
-                            dateAdded = Date(System.currentTimeMillis())
+                            dateAdded = Date(System.currentTimeMillis()),
+                            imgURI = imageUri
                         )
                         localService.insertJoke(joke)
                     }
+
                     is Delete -> {
                         viewModelScope.launch {
                             localService.deleteJoke(joke = event.joke)
                         }
                     }
+
+                    is Share -> {
+                        val meme = event.joke.imgURI
+                        val shareIntent = Intent()
+                        shareIntent.action = Intent.ACTION_SEND
+                        val resolver: ContentResolver = context.contentResolver
+                        shareIntent.action = Intent.ACTION_OPEN_DOCUMENT
+                        shareIntent.type = "image/*"
+                        shareIntent.setDataAndType(meme, meme?.let { resolver.getType(it) })
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, meme)
+                        shareIntent.putExtra(
+                            Intent.EXTRA_TEXT,
+                            "\n\nCreated with Got Jokes, available on Google Play."
+                        )
+                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        shareIntent.action = Intent.ACTION_SEND
+                        ContextCompat.startActivity(context, shareIntent, null)
+                    }
+
                     is UpdateColor -> {
                         when (_color.value) {
                             Color.Black -> _color.value = Color.Gray
@@ -169,6 +199,12 @@ class BuildViewModel @Inject constructor(
                             else -> _color.value = Color.Black
                         }
                     }
+
+                    is ResetColor -> {
+                        _color.value = Color.Black
+                    }
+
+                    else -> {}
                 }
 
             } catch (e: Exception) {
@@ -189,13 +225,14 @@ class BuildViewModel @Inject constructor(
             // check database
             // if not empty remove images > 2 weeks old
             val dbImages = localService.getAllImages()
-            val twoWeeksAgo: Date = convertLocalDateTimeToDate(LocalDateTime.now().minusWeeks(2L)) ?: Date(System.currentTimeMillis())
+            val twoWeeksAgo: Date = convertLocalDateTimeToDate(LocalDateTime.now().minusWeeks(2L))
+                ?: Date(System.currentTimeMillis())
             localService.clearOldImages(twoWeeksAgo)
 
             if (dbImages.size < 200) {
                 // ImgFLip
-                val imgFlipResult: ImgFlip = ImgFlipApi.retrofitService.getImgFlipMeme()
-                localService.insertImgFlipMemeImageList(imgFlipResult.data.memes)
+                val imgFlipResult: ImgFlip? = ImgFlipApi.retrofitService.getImgFlipMeme()
+                imgFlipResult?.data?.memes?.let { localService.insertImgFlipMemeImageList(it) }
 
                 // Google Results
                 val googleImageResult = GoogleImageApi.retrofitService.getGoogleImages()
@@ -227,7 +264,7 @@ class BuildViewModel @Inject constructor(
         if (_imageList.value.size > 10) {
             localService.removeOneImage((_imageUrl.value))
             _imageList.value = localService.getAllImages()
-            val rand = (0.._imageList.value.size - 1).shuffled().first()
+            val rand = (0 until _imageList.value.size).shuffled().first()
             val imageSearchEntity = imageList.value[rand]
             _imageUrl.value = imageSearchEntity.imageUrl
         } else {
@@ -238,8 +275,8 @@ class BuildViewModel @Inject constructor(
     private fun getImageList() {
         _loading = true
         getImages()
-        val rand = (0.._imageList.value.size - 1).shuffled().first()
-        val imageSearchEntity = imageList.value.get(rand)
+        val rand = (0 until _imageList.value.size).shuffled().first()
+        val imageSearchEntity = imageList.value[rand]
         _imageUrl.value = imageSearchEntity.imageUrl
         _loading = false
     }
@@ -252,7 +289,9 @@ class BuildViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val result = YoMammaApi.retrofitService.getYoMammaJoke()
-                _yoMamma.value = result
+                if (result != null) {
+                    _yoMamma.value = result
+                }
             } catch (e: Exception) {
                 Log.i("YoMamma", e.message + " with cause " + e.cause)
             }
@@ -260,14 +299,14 @@ class BuildViewModel @Inject constructor(
         }
     }
 
-    private fun ConvertToTextToYodaSpeak(text: String) {
+    private fun convertToTextToYodaSpeak(text: String) {
         viewModelScope.launch {
             try {
                 val result = YodaApiService.YodaSpeakApi.retrofitService.getYodaSpeak(text)
                 _caption.value = result?.contents?.translated ?: "Too many tries."
             } catch (e: Exception) {
                 Log.i("Yoda", e.message + " with cause " + e.cause)
-                _caption.value = "Sorry, Yoda only speaks 5 times an hour."
+                _caption.value = context.getString(R.string.sorry_yoda_only_speaks_5_times_an_hour)
             }
             _loading = false
         }
@@ -362,6 +401,4 @@ class BuildViewModel @Inject constructor(
             _loading = false
         }
     }
-
-
 }

@@ -22,7 +22,7 @@ data class ChuckNorris(
     @Json(name = "url")
     val url: String = "", // https://api.cuck.io
     @Json(name = "value")
-    val value: String = "" // Chuck Norris created girafes wen he uppercut a horse.
+    val value: String = "" // Chuck Norris created giraffes when he uppercut a horse.
 ) {
     companion object {
         @JvmStatic

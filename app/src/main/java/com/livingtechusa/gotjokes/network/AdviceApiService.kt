@@ -15,7 +15,7 @@ private val adviceRetrofit = Retrofit.Builder()
 
 interface AdviceApiService {
     @GET(ApiConstants.END_POINT_ADVICE)
-    suspend fun getadviceJoke(): Advice
+    suspend fun getadviceJoke(): Advice?
 
     object AdviceApi {
         val retrofitService: AdviceApiService by lazy {
